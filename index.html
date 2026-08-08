@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مولّد السياسات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A4A;
+    --ink-2:#0F1B33;
+    --gold:#C9A227;
+    --gold-light:#E4C766;
+    --paper:#FAF7EF;
+    --paper-2:#F2EDE0;
+    --charcoal:#2B2B2B;
+    --muted:#6B6558;
+    --line:#D9D0B8;
+    --ok:#3F6952;
+    --err:#8C3B2E;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--charcoal);
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    font-weight:400;
+    line-height:1.7;
+    min-height:100vh;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(27,42,74,0.045) 1px, transparent 0);
+    background-size: 22px 22px;
+    pointer-events:none;
+    z-index:0;
+  }
+  .wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 24px 80px;}
+
+  /* Header */
+  header{
+    padding:48px 0 36px;
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .brand{display:flex;align-items:center;gap:14px;}
+  .seal{
+    width:46px;height:46px;border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Aref Ruqaa', serif;
+    color:var(--gold);
+    font-size:20px;
+    flex-shrink:0;
+  }
+  .brand-text h1{
+    font-family:'Aref Ruqaa', serif;
+    font-size:26px;
+    margin:0;
+    color:var(--ink-2);
+  }
+  .brand-text p{margin:2px 0 0;font-size:13px;color:var(--muted);}
+  .cfg-btn{
+    background:none;border:1px solid var(--line);color:var(--muted);
+    font-family:inherit;font-size:13px;padding:8px 14px;border-radius:var(--radius);
+    cursor:pointer;transition:border-color .2s, color .2s;
+  }
+  .cfg-btn:hover{border-color:var(--ink);color:var(--ink);}
+
+  /* Hero */
+  .hero{padding:56px 0 40px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:.12em;color:var(--gold);
+    text-transform:uppercase;font-weight:600;margin:0 0 14px;
+  }
+  .hero h2{
+    font-family:'Aref Ruqaa', serif;
+    font-size:42px;line-height:1.35;
+    margin:0 0 18px;color:var(--ink-2);
+    max-width:640px;
+  }
+  .hero p{font-size:16px;color:var(--muted);max-width:520px;margin:0;}
+
+  /* Config panel */
+  .cfg-panel{
+    display:none;
+    background:var(--ink-2);color:var(--paper);
+    border-radius:var(--radius);
+    padding:20px 24px;margin-bottom:32px;
+    font-size:13px;
+  }
+  .cfg-panel.open{display:block;}
+  .cfg-panel label{display:block;margin-bottom:6px;color:var(--gold-light);font-weight:600;}
+  .cfg-panel input{
+    width:100%;padding:10px 12px;border-radius:var(--radius);border:1px solid #33456B;
+    background:#152341;color:#fff;font-family:inherit;font-size:13px;margin-bottom:12px;
+  }
+  .cfg-panel .hint{color:#9BA9C9;font-size:12px;line-height:1.6;}
+
+  /* Form card */
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:36px;
+    box-shadow:0 1px 0 var(--line);
+  }
+  .field{margin-bottom:22px;}
+  .field:last-of-type{margin-bottom:0;}
+  .field label{
+    display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px;
+  }
+  .field .sub{font-weight:400;color:var(--muted);font-size:12px;margin-right:6px;}
+  .field select, .field input[type=text], .field textarea{
+    width:100%;
+    font-family:inherit;font-size:14.5px;color:var(--charcoal);
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--paper);
+    transition:border-color .15s;
+  }
+  .field select:focus, .field input:focus, .field textarea:focus{
+    outline:none;border-color:var(--ink);
+  }
+  .field textarea{resize:vertical;min-height:96px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media (max-width:600px){.row2{grid-template-columns:1fr;}}
+
+  .submit-row{margin-top:32px;display:flex;align-items:center;gap:16px;}
+  .btn-primary{
+    background:var(--ink-2);color:var(--paper);
+    border:none;padding:14px 30px;font-family:inherit;font-size:14.5px;font-weight:600;
+    border-radius:var(--radius);cursor:pointer;
+    display:inline-flex;align-items:center;gap:10px;
+    transition:background .2s, transform .15s;
+  }
+  .btn-primary:hover{background:var(--ink);}
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+  .spinner{
+    width:15px;height:15px;border-radius:50%;
+    border:2px solid rgba(250,247,239,.35);border-top-color:var(--paper);
+    animation:spin .8s linear infinite;display:none;
+  }
+  .btn-primary.loading .spinner{display:inline-block;}
+  .btn-primary.loading .btn-label{opacity:.85;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .status{font-size:13px;color:var(--err);display:none;}
+  .status.show{display:block;}
+
+  /* Result */
+  .result{margin-top:48px;display:none;}
+  .result.show{display:block;animation:reveal .35s ease;}
+  @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .result-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;flex-wrap:wrap;gap:10px;
+  }
+  .result-head h3{
+    font-family:'Aref Ruqaa', serif;font-size:22px;margin:0;color:var(--ink-2);
+    display:flex;align-items:center;gap:10px;
+  }
+  .stamp{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11px;font-weight:700;color:var(--ok);
+    border:1px solid var(--ok);border-radius:100px;padding:3px 10px;
+    letter-spacing:.03em;
+    transform:rotate(-4deg);
+  }
+  .result-actions{display:flex;gap:10px;}
+  .icon-btn{
+    background:none;border:1px solid var(--line);color:var(--ink-2);
+    font-family:inherit;font-size:12.5px;padding:7px 14px;border-radius:var(--radius);
+    cursor:pointer;transition:border-color .2s;
+  }
+  .icon-btn:hover{border-color:var(--ink);}
+  .doc{
+    background:#fff;border:1px solid var(--line);
+    border-top:3px solid var(--gold);
+    padding:34px 38px;
+    border-radius:var(--radius);
+    white-space:pre-wrap;
+    font-size:15px;line-height:1.9;color:var(--charcoal);
+    max-height:520px;overflow-y:auto;
+  }
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="seal">س</div>
+      <div class="brand-text">
+        <h1>مولّد السياسات</h1>
+        <p>سياسات قانونية جاهزة خلال دقائق</p>
+      </div>
+    </div>
+    <button class="cfg-btn" id="cfgToggle">إعداد الاتصال</button>
+  </header>
+
+  <div class="cfg-panel" id="cfgPanel">
+    <label>رابط Webhook الخاص بـ n8n</label>
+    <input type="text" id="webhookUrl" placeholder="https://your-n8n-instance.com/webhook/generate-policy">
+    <p class="hint">
+      الصق هنا رابط الـ Webhook Trigger من سير عمل n8n. تأكد أن نوع الطلب POST وأن استجابة الويب هوك (Respond to Webhook) تُفعَّل بعد خطوة توليد النص عبر ChatGPT، وأن الرد يحتوي على حقل نصي باسم <code>policy</code>. إذا واجهت خطأ CORS، فعّل خيار "Allow CORS" أو أضف ترويسة <code>Access-Control-Allow-Origin: *</code> في عقدة الرد.
+    </p>
+  </div>
+
+  <section class="hero">
+    <p class="eyebrow">مدعوم بالذكاء الاصطناعي عبر n8n</p>
+    <h2>صِف نشاطك، ونتولّى صياغة سياستك القانونية</h2>
+    <p>اختر نوع السياسة، وأدخل تفاصيل نشاطك التجاري، وسنولّد لك مسودة سياسة كاملة جاهزة للمراجعة والنشر.</p>
+  </section>
+
+  <form class="card" id="policyForm">
+    <div class="field">
+      <label>نوع السياسة</label>
+      <select id="policyType" required>
+        <option value="">اختر نوع السياسة</option>
+        <option value="سياسة الخصوصية">سياسة الخصوصية (Privacy Policy)</option>
+        <option value="الشروط والأحكام">الشروط والأحكام (Terms & Conditions)</option>
+        <option value="سياسة الاسترجاع والاستبدال">سياسة الاسترجاع والاستبدال</option>
+        <option value="سياسة ملفات تعريف الارتباط">سياسة ملفات تعريف الارتباط (Cookies)</option>
+        <option value="سياسة الموارد البشرية">سياسة الموارد البشرية الداخلية</option>
+        <option value="سياسة أمن المعلومات">سياسة أمن المعلومات</option>
+        <option value="أخرى">أخرى (حدد في الملاحظات)</option>
+      </select>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>اسم الشركة أو الموقع</label>
+        <input type="text" id="companyName" placeholder="مثال: متجر لمسة" required>
+      </div>
+      <div class="field">
+        <label>المجال أو نوع النشاط</label>
+        <input type="text" id="industry" placeholder="مثال: متجر إلكتروني للأزياء" required>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>الدولة / النظام القانوني المعمول به</label>
+        <input type="text" id="jurisdiction" placeholder="مثال: المملكة العربية السعودية" required>
+      </div>
+      <div class="field">
+        <label>لغة السياسة</label>
+        <select id="language">
+          <option value="العربية">العربية</option>
+          <option value="الإنجليزية">الإنجليزية</option>
+          <option value="العربية والإنجليزية">العربية والإنجليزية معاً</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>تفاصيل إضافية <span class="sub">اختياري</span></label>
+      <textarea id="notes" placeholder="أي بنود خاصة تريد تضمينها، بيانات تواصل، روابط، أو ملاحظات أخرى..."></textarea>
+    </div>
+
+    <div class="submit-row">
+      <button type="submit" class="btn-primary" id="submitBtn">
+        <span class="spinner"></span>
+        <span class="btn-label">توليد السياسة</span>
+      </button>
+      <span class="status" id="statusMsg"></span>
+    </div>
+  </form>
+
+  <div class="result" id="resultBlock">
+    <div class="result-head">
+      <h3>السياسة المولّدة <span class="stamp">✓ جاهزة</span></h3>
+      <div class="result-actions">
+        <button class="icon-btn" id="copyBtn">نسخ النص</button>
+        <button class="icon-btn" id="downloadBtn">تنزيل كملف نصي</button>
+      </div>
+    </div>
+    <div class="doc" id="docOutput"></div>
+  </div>
+
+  <footer>هذه المسودة تُنتج آلياً عبر نموذج لغوي، ويُنصح بمراجعتها من قِبل مختص قانوني قبل النشر أو الاعتماد.</footer>
+</div>
+
+<script>
+  const cfgToggle = document.getElementById('cfgToggle');
+  const cfgPanel = document.getElementById('cfgPanel');
+  cfgToggle.addEventListener('click', () => cfgPanel.classList.toggle('open'));
+
+  // ⚠️ عدّل هذا الرابط ليطابق رابط الـ Webhook الفعلي من سير عمل n8n الخاص بك.
+  // يمكن أيضاً لصقه من واجهة "إعداد الاتصال" أثناء الاختبار.
+  let WEBHOOK_URL = "https://YOUR-N8N-INSTANCE.example.com/webhook/generate-policy";
+
+  const webhookInput = document.getElementById('webhookUrl');
+  webhookInput.value = WEBHOOK_URL;
+  webhookInput.addEventListener('input', () => { WEBHOOK_URL = webhookInput.value.trim(); });
+
+  const form = document.getElementById('policyForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusMsg = document.getElementById('statusMsg');
+  const resultBlock = document.getElementById('resultBlock');
+  const docOutput = document.getElementById('docOutput');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusMsg.classList.remove('show');
+
+    if (!WEBHOOK_URL || WEBHOOK_URL.includes('YOUR-N8N-INSTANCE')) {
+      statusMsg.textContent = 'الرجاء إدخال رابط Webhook صحيح من إعداد الاتصال أعلاه.';
+      statusMsg.classList.add('show');
+      cfgPanel.classList.add('open');
+      return;
+    }
+
+    const payload = {
+      policyType: document.getElementById('policyType').value,
+      companyName: document.getElementById('companyName').value,
+      industry: document.getElementById('industry').value,
+      jurisdiction: document.getElementById('jurisdiction').value,
+      language: document.getElementById('language').value,
+      notes: document.getElementById('notes').value
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    submitBtn.querySelector('.btn-label').textContent = 'جاري التوليد...';
+    resultBlock.classList.remove('show');
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('فشل الاتصال بالخادم (رمز: ' + res.status + ')');
+
+      const data = await res.json();
+      // يدعم عدة أشكال شائعة لاستجابة n8n / ChatGPT
+      const text = data.policy || data.output || data.text || data.message ||
+                   (Array.isArray(data) && (data[0]?.policy || data[0]?.output || data[0]?.text)) ||
+                   JSON.stringify(data, null, 2);
+
+      docOutput.textContent = text;
+      resultBlock.classList.add('show');
+      resultBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (err) {
+      statusMsg.textContent = 'تعذّر توليد السياسة: ' + err.message + '. تأكد من صحة رابط Webhook وأن CORS مفعّل في n8n.';
+      statusMsg.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      submitBtn.querySelector('.btn-label').textContent = 'توليد السياسة';
+    }
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(docOutput.textContent).then(() => {
+      const btn = document.getElementById('copyBtn');
+      const original = btn.textContent;
+      btn.textContent = 'تم النسخ ✓';
+      setTimeout(() => { btn.textContent = original; }, 1600);
+    });
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const blob = new Blob([docOutput.textContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'policy.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>
