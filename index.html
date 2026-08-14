@@ -298,8 +298,8 @@
 
   // ⚠️ عدّل هذا الرابط ليطابق رابط الـ Webhook الفعلي من سير عمل n8n الخاص بك.
   // يمكن أيضاً لصقه من واجهة "إعداد الاتصال" أثناء الاختبار.
-  let WEBHOOK_URL = "https://YOUR-N8N-INSTANCE.example.com/webhook/generate-policy";
-
+  
+  let WEBHOOK_URL = "https://policy-rag-alpha.vercel.app/api/generate-policy";
   const webhookInput = document.getElementById('webhookUrl');
   webhookInput.value = WEBHOOK_URL;
   webhookInput.addEventListener('input', () => { WEBHOOK_URL = webhookInput.value.trim(); });
