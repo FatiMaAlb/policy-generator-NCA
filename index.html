@@ -1,339 +1,651 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="htmlRoot">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مولّد السياسات</title>
+<title id="pageTitle">مولّد السياسات الأمنية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&family=Almarai:wght@400;700&family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   :root{
-    --ink:#1B2A4A;
-    --ink-2:#0F1B33;
-    --gold:#C9A227;
-    --gold-light:#E4C766;
-    --paper:#FAF7EF;
-    --paper-2:#F2EDE0;
-    --charcoal:#2B2B2B;
-    --muted:#6B6558;
-    --line:#D9D0B8;
-    --ok:#3F6952;
-    --err:#8C3B2E;
-    --radius:2px;
+    --blue:#2563EB; --blue-dark:#1D4ED8; --blue-light:#EFF6FF;
+    --ink:#0F172A; --muted:#64748B; --line:#E2E8F0; --bg:#F8FAFC; --card:#FFFFFF;
+    --ok:#16A34A; --err:#DC2626; --radius:10px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{
-    background:var(--paper);
-    color:var(--charcoal);
-    font-family:'IBM Plex Sans Arabic', sans-serif;
-    font-weight:400;
-    line-height:1.7;
-    min-height:100vh;
-  }
-  body::before{
-    content:"";
-    position:fixed;inset:0;
-    background-image: radial-gradient(circle at 1px 1px, rgba(27,42,74,0.045) 1px, transparent 0);
-    background-size: 22px 22px;
-    pointer-events:none;
-    z-index:0;
-  }
-  .wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 24px 80px;}
+  body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic', sans-serif;line-height:1.7;}
+  html[lang="en"] body{font-family:'Inter', sans-serif;}
 
-  /* Header */
-  header{
-    padding:48px 0 36px;
-    border-bottom:1px solid var(--line);
-    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  .nav{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:14px 32px;gap:16px;}
+  .nav-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;}
+  .nav-brand .dot{width:22px;height:22px;border-radius:6px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .nav-brand .dot svg{width:13px;height:13px;}
+  .nav-links{display:flex;gap:28px;font-size:13.5px;color:#CBD5E1;}
+  .nav-links a{color:inherit;text-decoration:none;cursor:pointer;transition:color .15s;}
+  .nav-links a:hover{color:#fff;}
+  .nav-links a.active{color:#fff;font-weight:600;}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .lang-toggle{display:flex;border:1px solid #334155;border-radius:7px;overflow:hidden;}
+  .lang-toggle button{
+    background:none;border:none;color:#CBD5E1;font-family:inherit;font-size:12.5px;font-weight:600;
+    padding:7px 13px;cursor:pointer;transition:background .15s,color .15s;
   }
-  .brand{display:flex;align-items:center;gap:14px;}
-  .seal{
-    width:46px;height:46px;border-radius:50%;
-    border:2px solid var(--gold);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Aref Ruqaa', serif;
-    color:var(--gold);
-    font-size:20px;
-    flex-shrink:0;
-  }
-  .brand-text h1{
-    font-family:'Aref Ruqaa', serif;
-    font-size:26px;
-    margin:0;
-    color:var(--ink-2);
-  }
-  .brand-text p{margin:2px 0 0;font-size:13px;color:var(--muted);}
-  .cfg-btn{
-    background:none;border:1px solid var(--line);color:var(--muted);
-    font-family:inherit;font-size:13px;padding:8px 14px;border-radius:var(--radius);
-    cursor:pointer;transition:border-color .2s, color .2s;
-  }
-  .cfg-btn:hover{border-color:var(--ink);color:var(--ink);}
+  .lang-toggle button.active{background:var(--blue);color:#fff;}
+  .nav-cta{background:var(--blue);color:#fff;border:none;font-family:inherit;font-size:13.5px;font-weight:600;padding:9px 20px;border-radius:7px;cursor:pointer;transition:background .15s;}
+  .nav-cta:hover{background:var(--blue-dark);}
+  @media (max-width:800px){ .nav-links{display:none;} }
 
-  /* Hero */
-  .hero{padding:56px 0 40px;}
-  .eyebrow{
-    font-size:12px;letter-spacing:.12em;color:var(--gold);
-    text-transform:uppercase;font-weight:600;margin:0 0 14px;
-  }
-  .hero h2{
-    font-family:'Aref Ruqaa', serif;
-    font-size:42px;line-height:1.35;
-    margin:0 0 18px;color:var(--ink-2);
-    max-width:640px;
-  }
-  .hero p{font-size:16px;color:var(--muted);max-width:520px;margin:0;}
+  .hero{background:linear-gradient(180deg, var(--blue-light) 0%, var(--bg) 100%);padding:56px 24px 44px;text-align:center;}
+  .hero h1{font-size:32px;font-weight:700;margin:0 0 12px;color:var(--ink);}
+  .hero p{font-size:15px;color:var(--muted);margin:0 auto;max-width:560px;}
 
-  /* Config panel */
-  .cfg-panel{
-    display:none;
-    background:var(--ink-2);color:var(--paper);
-    border-radius:var(--radius);
-    padding:20px 24px;margin-bottom:32px;
-    font-size:13px;
-  }
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px 90px;}
+
+  .cfg-row{display:flex;justify-content:flex-end;margin:20px 0 0;}
+  .cfg-toggle{background:none;border:1px solid var(--line);color:var(--muted);font-family:inherit;font-size:12.5px;padding:7px 14px;border-radius:7px;cursor:pointer;}
+  .cfg-toggle:hover{border-color:var(--blue);color:var(--blue);}
+  .cfg-panel{display:none;background:var(--ink);color:#E2E8F0;border-radius:var(--radius);padding:18px 22px;margin-top:12px;font-size:13px;}
   .cfg-panel.open{display:block;}
-  .cfg-panel label{display:block;margin-bottom:6px;color:var(--gold-light);font-weight:600;}
-  .cfg-panel input{
-    width:100%;padding:10px 12px;border-radius:var(--radius);border:1px solid #33456B;
-    background:#152341;color:#fff;font-family:inherit;font-size:13px;margin-bottom:12px;
-  }
-  .cfg-panel .hint{color:#9BA9C9;font-size:12px;line-height:1.6;}
+  .cfg-panel label{display:block;margin-bottom:6px;color:#93C5FD;font-weight:600;}
+  .cfg-panel input{width:100%;padding:10px 12px;border-radius:7px;border:1px solid #334155;background:#1E293B;color:#fff;font-family:inherit;font-size:13px;margin-bottom:10px;}
+  .cfg-panel .hint{color:#94A3B8;font-size:12px;line-height:1.6;}
 
-  /* Form card */
-  .card{
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:36px;
-    box-shadow:0 1px 0 var(--line);
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:32px;margin-top:28px;}
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .section-head .ic{width:22px;height:22px;border-radius:6px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .section-head .ic svg{width:12px;height:12px;stroke:var(--blue);}
+  .section-head h2{font-size:16.5px;font-weight:700;margin:0;color:var(--ink);}
+  .section-sub{font-size:13px;color:var(--muted);margin:4px 0 24px 32px;}
+  html[dir="ltr"] .section-sub{margin:4px 0 24px 0;margin-inline-start:32px;}
+
+  .field{margin-bottom:20px;}
+  .field label{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:7px;}
+  .field .req{color:var(--blue);font-weight:400;}
+  .field .sub{font-weight:400;color:var(--muted);font-size:12px;}
+  .field select, .field input[type=text], .field input[type=email], .field textarea{
+    width:100%;font-family:inherit;font-size:14px;color:var(--ink);padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:#fff;transition:border-color .15s, box-shadow .15s;
   }
-  .field{margin-bottom:22px;}
-  .field:last-of-type{margin-bottom:0;}
-  .field label{
-    display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px;
-  }
-  .field .sub{font-weight:400;color:var(--muted);font-size:12px;margin-right:6px;}
-  .field select, .field input[type=text], .field textarea{
-    width:100%;
-    font-family:inherit;font-size:14.5px;color:var(--charcoal);
-    padding:12px 14px;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    background:var(--paper);
-    transition:border-color .15s;
-  }
-  .field select:focus, .field input:focus, .field textarea:focus{
-    outline:none;border-color:var(--ink);
-  }
-  .field textarea{resize:vertical;min-height:96px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .field select:disabled, .field input:disabled{background:#F1F5F9;color:var(--muted);}
+  .field select:focus, .field input:focus, .field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-light);}
+  .field textarea{resize:vertical;min-height:84px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   @media (max-width:600px){.row2{grid-template-columns:1fr;}}
 
+  .check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:600px){.check-grid{grid-template-columns:1fr;}}
+  .check-item{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:8px;padding:11px 13px;cursor:pointer;transition:border-color .15s, background .15s;}
+  .check-item:hover{border-color:var(--blue);}
+  .check-item.checked{border-color:var(--blue);background:var(--blue-light);}
+  .check-item input{margin-top:3px;accent-color:var(--blue);flex-shrink:0;}
+  .check-item .lbl{font-size:13.5px;}
+  .check-item .lbl b{display:block;font-weight:600;color:var(--ink);}
+  .check-item .lbl span{color:var(--muted);font-size:12px;}
+
+  .radio-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .radio-card{flex:1;min-width:220px;border:1px solid var(--line);border-radius:8px;padding:14px 16px;cursor:pointer;transition:border-color .15s, background .15s;}
+  .radio-card:hover{border-color:var(--blue);}
+  .radio-card.checked{border-color:var(--blue);background:var(--blue-light);}
+  .radio-card input{accent-color:var(--blue);margin-left:8px;}
+  .radio-card b{font-size:13.5px;color:var(--ink);}
+  .radio-card p{margin:4px 0 0;font-size:12px;color:var(--muted);}
+
+  .divider{border:none;border-top:1px solid var(--line);margin:30px 0;}
+
+  .file-row{display:flex;align-items:center;gap:12px;}
+  .file-btn{background:#fff;border:1px solid var(--line);color:var(--ink);font-family:inherit;font-size:13px;padding:10px 16px;border-radius:8px;cursor:pointer;}
+  .file-btn:hover{border-color:var(--blue);color:var(--blue);}
+  .file-preview{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);}
+  .file-preview img{height:32px;border-radius:4px;border:1px solid var(--line);}
+
   .submit-row{margin-top:32px;display:flex;align-items:center;gap:16px;}
-  .btn-primary{
-    background:var(--ink-2);color:var(--paper);
-    border:none;padding:14px 30px;font-family:inherit;font-size:14.5px;font-weight:600;
-    border-radius:var(--radius);cursor:pointer;
-    display:inline-flex;align-items:center;gap:10px;
-    transition:background .2s, transform .15s;
-  }
-  .btn-primary:hover{background:var(--ink);}
+  .btn-primary{background:var(--blue);color:#fff;border:none;padding:13px 28px;font-family:inherit;font-size:14.5px;font-weight:600;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background .2s, transform .15s;}
+  .btn-primary:hover{background:var(--blue-dark);}
   .btn-primary:active{transform:scale(.98);}
   .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
-  .spinner{
-    width:15px;height:15px;border-radius:50%;
-    border:2px solid rgba(250,247,239,.35);border-top-color:var(--paper);
-    animation:spin .8s linear infinite;display:none;
-  }
+  .spinner{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .8s linear infinite;display:none;}
   .btn-primary.loading .spinner{display:inline-block;}
-  .btn-primary.loading .btn-label{opacity:.85;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
   .status{font-size:13px;color:var(--err);display:none;}
   .status.show{display:block;}
 
-  /* Result */
-  .result{margin-top:48px;display:none;}
+  .result{margin-top:32px;display:none;}
   .result.show{display:block;animation:reveal .35s ease;}
   @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-  .result-head{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:14px;flex-wrap:wrap;gap:10px;
-  }
-  .result-head h3{
-    font-family:'Aref Ruqaa', serif;font-size:22px;margin:0;color:var(--ink-2);
-    display:flex;align-items:center;gap:10px;
-  }
-  .stamp{
-    display:inline-flex;align-items:center;gap:6px;
-    font-size:11px;font-weight:700;color:var(--ok);
-    border:1px solid var(--ok);border-radius:100px;padding:3px 10px;
-    letter-spacing:.03em;
-    transform:rotate(-4deg);
-  }
+  .result-item{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;margin-top:16px;}
+  .result-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .result-head h3{font-size:16px;font-weight:700;margin:0;color:var(--ink);display:flex;align-items:center;gap:10px;}
+  .stamp{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--ok);background:#F0FDF4;border-radius:100px;padding:3px 10px;}
   .result-actions{display:flex;gap:10px;}
-  .icon-btn{
-    background:none;border:1px solid var(--line);color:var(--ink-2);
-    font-family:inherit;font-size:12.5px;padding:7px 14px;border-radius:var(--radius);
-    cursor:pointer;transition:border-color .2s;
-  }
-  .icon-btn:hover{border-color:var(--ink);}
-  .doc{
-    background:#fff;border:1px solid var(--line);
-    border-top:3px solid var(--gold);
-    padding:34px 38px;
-    border-radius:var(--radius);
-    white-space:pre-wrap;
-    font-size:15px;line-height:1.9;color:var(--charcoal);
-    max-height:520px;overflow-y:auto;
-  }
+  .icon-btn{background:none;border:1px solid var(--line);color:var(--ink);font-family:inherit;font-size:12.5px;padding:7px 14px;border-radius:7px;cursor:pointer;transition:border-color .2s, color .2s;}
+  .icon-btn:hover{border-color:var(--blue);color:var(--blue);}
+  .icon-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .icon-btn.primary:hover{background:var(--blue-dark);}
+  .doc{background:#F8FAFC;border:1px solid var(--line);border-inline-start:3px solid var(--blue);padding:24px 26px;border-radius:8px;white-space:pre-wrap;font-size:14px;line-height:1.9;color:var(--ink);max-height:420px;overflow-y:auto;}
 
-  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);
-    font-size:12px;color:var(--muted);text-align:center;}
+  footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;}
+
+  #pdfTemplate{position:fixed;top:-99999px;left:-99999px;width:760px;background:#fff;padding:50px 55px;}
+  #pdfTemplate .pdf-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1D4ED8;padding-bottom:16px;margin-bottom:26px;}
+  #pdfTemplate .pdf-header img{max-height:60px;max-width:180px;}
+  #pdfTemplate .pdf-title{font-size:20px;font-weight:700;color:#0F172A;}
+  #pdfTemplate .pdf-meta{font-size:11px;color:#64748B;margin-bottom:22px;line-height:1.8;}
+  #pdfTemplate .pdf-section-title{font-size:16px;font-weight:700;color:#1D4ED8;margin:26px 0 10px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;}
+  #pdfTemplate .pdf-body{font-size:13px;line-height:2;white-space:pre-wrap;color:#1E293B;}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div class="brand">
-      <div class="seal">س</div>
-      <div class="brand-text">
-        <h1>مولّد السياسات</h1>
-        <p>سياسات قانونية جاهزة خلال دقائق</p>
-      </div>
+  <nav class="nav">
+    <div class="nav-brand">
+      <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/></svg></span>
+      <span data-i18n="brand"></span>
     </div>
-    <button class="cfg-btn" id="cfgToggle">إعداد الاتصال</button>
-  </header>
-
-  <div class="cfg-panel" id="cfgPanel">
-    <label>رابط Webhook الخاص بـ n8n</label>
-    <input type="text" id="webhookUrl" placeholder="https://your-n8n-instance.com/webhook/generate-policy">
-    <p class="hint">
-      الصق هنا رابط الـ Webhook Trigger من سير عمل n8n. تأكد أن نوع الطلب POST وأن استجابة الويب هوك (Respond to Webhook) تُفعَّل بعد خطوة توليد النص عبر ChatGPT، وأن الرد يحتوي على حقل نصي باسم <code>policy</code>. إذا واجهت خطأ CORS، فعّل خيار "Allow CORS" أو أضف ترويسة <code>Access-Control-Allow-Origin: *</code> في عقدة الرد.
-    </p>
-  </div>
+    <div class="nav-links">
+      <a data-i18n="navHome"></a>
+      <a class="active" data-i18n="navGenerate"></a>
+      <a data-i18n="navDashboard"></a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button type="button" id="langArBtn" class="active">AR</button>
+        <button type="button" id="langEnBtn">EN</button>
+      </div>
+      <button class="nav-cta" data-i18n="navCta" onclick="document.getElementById('policyForm').scrollIntoView({behavior:'smooth'})"></button>
+    </div>
+  </nav>
 
   <section class="hero">
-    <p class="eyebrow">مدعوم بالذكاء الاصطناعي عبر n8n</p>
-    <h2>صِف نشاطك، ونتولّى صياغة سياستك القانونية</h2>
-    <p>اختر نوع السياسة، وأدخل تفاصيل نشاطك التجاري، وسنولّد لك مسودة سياسة كاملة جاهزة للمراجعة والنشر.</p>
+    <h1 data-i18n="heroTitle"></h1>
+    <p data-i18n="heroSub"></p>
   </section>
 
-  <form class="card" id="policyForm">
-    <div class="field">
-      <label>نوع السياسة</label>
-      <select id="policyType" required>
-        <option value="">اختر نوع السياسة</option>
-        <option value="سياسة الخصوصية">سياسة الخصوصية (Privacy Policy)</option>
-        <option value="الشروط والأحكام">الشروط والأحكام (Terms & Conditions)</option>
-        <option value="سياسة الاسترجاع والاستبدال">سياسة الاسترجاع والاستبدال</option>
-        <option value="سياسة ملفات تعريف الارتباط">سياسة ملفات تعريف الارتباط (Cookies)</option>
-        <option value="سياسة الموارد البشرية">سياسة الموارد البشرية الداخلية</option>
-        <option value="سياسة أمن المعلومات">سياسة أمن المعلومات</option>
-        <option value="أخرى">أخرى (حدد في الملاحظات)</option>
-      </select>
+  <div class="wrap">
+
+    <div class="cfg-row"><button class="cfg-toggle" id="cfgToggle" data-i18n="cfgToggle"></button></div>
+    <div class="cfg-panel" id="cfgPanel">
+      <label data-i18n="cfgLabel"></label>
+      <input type="text" id="webhookUrl" placeholder="https://your-project.vercel.app/api/generate-policy">
+      <p class="hint" data-i18n="cfgHint"></p>
     </div>
 
-    <div class="row2">
-      <div class="field">
-        <label>اسم الشركة أو الموقع</label>
-        <input type="text" id="companyName" placeholder="مثال: متجر لمسة" required>
+    <form id="policyForm">
+
+      <div class="card">
+        <div class="section-head">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+          <h2 data-i18n="orgInfoTitle"></h2>
+        </div>
+        <p class="section-sub" data-i18n="orgInfoSub"></p>
+
+        <div class="row2">
+          <div class="field">
+            <label data-i18n="companyNameLabel"></label>
+            <input type="text" id="companyName" required>
+          </div>
+          <div class="field">
+            <label data-i18n="industryLabel"></label>
+            <select id="industry" required></select>
+            <input type="text" id="industryOther" style="display:none;margin-top:10px;">
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label data-i18n="employeeCountLabel"></label>
+            <select id="employeeCount" required></select>
+          </div>
+          <div class="field">
+            <label data-i18n="contactEmailLabel"></label>
+            <input type="email" id="contactEmail" placeholder="example@company.com" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="businessActivitiesLabel"></label>
+          <textarea id="businessActivities" required></textarea>
+        </div>
+
+        <div class="field">
+          <label data-i18n="dataTypesLabel"></label>
+          <textarea id="dataTypes" required></textarea>
+        </div>
+
+        <div class="field">
+          <label data-i18n="jurisdictionLabel"></label>
+          <input type="text" id="jurisdiction" disabled>
+        </div>
       </div>
-      <div class="field">
-        <label>المجال أو نوع النشاط</label>
-        <input type="text" id="industry" placeholder="مثال: متجر إلكتروني للأزياء" required>
+
+      <div class="card">
+        <div class="section-head">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6z"/></svg></span>
+          <h2 data-i18n="frameworksTitle"></h2>
+        </div>
+        <p class="section-sub" data-i18n="frameworksSub"></p>
+        <div class="check-grid" id="frameworkGrid"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg></span>
+          <h2 data-i18n="policiesTitle"></h2>
+        </div>
+        <p class="section-sub" data-i18n="policiesSub"></p>
+        <div class="check-grid" id="policyTypeGrid"></div>
+
+        <div class="field" style="margin-top:20px;">
+          <label data-i18n="genLanguageLabel"></label>
+          <select id="language">
+            <option value="ar" data-i18n="langOptAr"></option>
+            <option value="en" data-i18n="langOptEn"></option>
+            <option value="both" data-i18n="langOptBoth"></option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label data-i18n="notesLabel"></label>
+          <textarea id="notes"></textarea>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section-head" style="margin-bottom:14px;">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span>
+          <h2 data-i18n="outputModeTitle"></h2>
+        </div>
+        <div class="radio-row" id="outputModeRow">
+          <label class="radio-card checked">
+            <input type="radio" name="outputMode" value="separate" checked>
+            <b data-i18n="outputSeparateTitle"></b>
+            <p data-i18n="outputSeparateDesc"></p>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="outputMode" value="unified">
+            <b data-i18n="outputUnifiedTitle"></b>
+            <p data-i18n="outputUnifiedDesc"></p>
+          </label>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section-head" style="margin-bottom:14px;">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></span>
+          <h2 data-i18n="pdfCustomTitle"></h2>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label data-i18n="logoLabel"></label>
+            <div class="file-row">
+              <button type="button" class="file-btn" id="logoBtn" data-i18n="logoBtn"></button>
+              <input type="file" id="logoInput" accept="image/*" style="display:none;">
+              <span class="file-preview" id="logoPreview"></span>
+            </div>
+          </div>
+          <div class="field">
+            <label data-i18n="pdfFontLabel"></label>
+            <select id="pdfFont">
+              <option value="'IBM Plex Sans Arabic', sans-serif">IBM Plex Sans Arabic</option>
+              <option value="'Cairo', sans-serif">Cairo</option>
+              <option value="'Tajawal', sans-serif">Tajawal</option>
+              <option value="'Almarai', sans-serif">Almarai</option>
+              <option value="'Amiri', serif">Amiri</option>
+              <option value="'Inter', sans-serif">Inter</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <span class="spinner"></span>
+            <span class="btn-label" data-i18n="submitBtn"></span>
+          </button>
+          <span class="status" id="statusMsg"></span>
+        </div>
+      </div>
+    </form>
+
+    <div class="result" id="resultBlock">
+      <div id="resultList"></div>
+      <div style="margin-top:18px;">
+        <button class="icon-btn primary" id="downloadAllBtn" data-i18n="downloadAllBtn"></button>
       </div>
     </div>
 
-    <div class="row2">
-      <div class="field">
-        <label>الدولة / النظام القانوني المعمول به</label>
-        <input type="text" id="jurisdiction" placeholder="مثال: المملكة العربية السعودية" required>
-      </div>
-      <div class="field">
-        <label>لغة السياسة</label>
-        <select id="language">
-          <option value="العربية">العربية</option>
-          <option value="الإنجليزية">الإنجليزية</option>
-          <option value="العربية والإنجليزية">العربية والإنجليزية معاً</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>تفاصيل إضافية <span class="sub">اختياري</span></label>
-      <textarea id="notes" placeholder="أي بنود خاصة تريد تضمينها، بيانات تواصل، روابط، أو ملاحظات أخرى..."></textarea>
-    </div>
-
-    <div class="submit-row">
-      <button type="submit" class="btn-primary" id="submitBtn">
-        <span class="spinner"></span>
-        <span class="btn-label">توليد السياسة</span>
-      </button>
-      <span class="status" id="statusMsg"></span>
-    </div>
-  </form>
-
-  <div class="result" id="resultBlock">
-    <div class="result-head">
-      <h3>السياسة المولّدة <span class="stamp">✓ جاهزة</span></h3>
-      <div class="result-actions">
-        <button class="icon-btn" id="copyBtn">نسخ النص</button>
-        <button class="icon-btn" id="downloadBtn">تنزيل كملف نصي</button>
-      </div>
-    </div>
-    <div class="doc" id="docOutput"></div>
+    <footer data-i18n="footerNote"></footer>
   </div>
 
-  <footer>هذه المسودة تُنتج آلياً عبر نموذج لغوي، ويُنصح بمراجعتها من قِبل مختص قانوني قبل النشر أو الاعتماد.</footer>
-</div>
+  <div id="pdfTemplate">
+    <div class="pdf-header">
+      <div class="pdf-title" id="pdfTitleCompany"></div>
+      <img id="pdfLogoImg" style="display:none;">
+    </div>
+    <div class="pdf-meta" id="pdfMeta"></div>
+    <div id="pdfSections"></div>
+  </div>
 
 <script>
+  // ---------------------------------------------------------------------
+  // i18n: site UI language (separate from the "generated policy language"
+  // dropdown, which controls what language GPT-4o writes the policy in).
+  // ---------------------------------------------------------------------
+  const translations = {
+    ar: {
+      pageTitle: "مولّد السياسات الأمنية",
+      brand: "مولّد السياسات",
+      navHome: "الرئيسية", navGenerate: "توليد السياسات", navDashboard: "لوحة التحكم", navCta: "ابدأ الآن",
+      heroTitle: "ولّد سياساتك الأمنية بدقة",
+      heroSub: "زوّدنا بمعلومات عن منشأتك لنولّد لك سياسات أمن معلومات مبنية على الضوابط والجهات التنظيمية التي تختارها، جاهزة للتحميل كملف PDF بهوية مؤسستك.",
+      cfgToggle: "إعداد الاتصال",
+      cfgLabel: "رابط نقطة التوليد (Vercel Endpoint)",
+      cfgHint: "هذا الرابط يشير إلى دالة الخادم التي تنفّذ البحث الدلالي في قاعدة الضوابط ثم توليد السياسات عبر GPT-4o. يجب أن يعيد الرد حقلاً باسم policies (مصفوفة).",
+      orgInfoTitle: "معلومات المنشأة",
+      orgInfoSub: "أخبرنا عن منشأتك لنساعدك في إنشاء سياسات مصمّمة خصيصاً لاحتياجاتك",
+      companyNameLabel: "اسم المنشأة *",
+      industryLabel: "القطاع *",
+      employeeCountLabel: "عدد الموظفين *",
+      contactEmailLabel: "البريد الإلكتروني للتواصل *",
+      businessActivitiesLabel: "الأنشطة التجارية الرئيسية *",
+      dataTypesLabel: "أنواع البيانات المتعامل معها *",
+      jurisdictionLabel: "الدولة",
+      jurisdictionValue: "المملكة العربية السعودية",
+      frameworksTitle: "الجهات التنظيمية والتشريعية",
+      frameworksSub: "اختر جهة واحدة أو أكثر لتُبنى السياسات على ضوابطها المعتمدة",
+      policiesTitle: "السياسات المطلوبة",
+      policiesSub: "اختر نوعاً واحداً أو أكثر من السياسات التي تحتاجها",
+      genLanguageLabel: "لغة السياسة المولّدة",
+      langOptAr: "العربية", langOptEn: "الإنجليزية", langOptBoth: "العربية والإنجليزية معاً",
+      notesLabel: "تفاصيل إضافية (اختياري)",
+      outputModeTitle: "طريقة إخراج الملفات",
+      outputSeparateTitle: "ملف منفصل لكل سياسة",
+      outputSeparateDesc: "يتم إنشاء ملف PDF مستقل لكل نوع سياسة تختاره",
+      outputUnifiedTitle: "ملف موحد لجميع السياسات",
+      outputUnifiedDesc: "يتم دمج جميع السياسات المختارة في ملف PDF واحد",
+      pdfCustomTitle: "تخصيص ملف PDF",
+      logoLabel: "شعار المؤسسة (اختياري)",
+      logoBtn: "اختر صورة الشعار",
+      pdfFontLabel: "الخط المستخدم في الملف",
+      submitBtn: "توليد السياسات",
+      downloadAllBtn: "تحميل جميع الملفات كـ PDF",
+      footerNote: "هذه المسودات تُنتج آلياً عبر نموذج لغوي مبني على الضوابط والجهات التنظيمية المختارة، ويُنصح بمراجعتها من قِبل مختص أمن معلومات قبل الاعتماد.",
+      industryOptions: [
+        ["", "اختر القطاع"], ["gov", "القطاع الحكومي"], ["finance", "القطاع المالي والمصرفي"],
+        ["health", "الرعاية الصحية (صحي)"], ["education", "التعليم"], ["ict", "الاتصالات وتقنية المعلومات"],
+        ["retail", "التجارة والتجزئة"], ["energy", "الطاقة والمرافق"], ["other", "أخرى (حدد أدناه)"]
+      ],
+      industryOtherPlaceholder: "اكتب مجال منشأتك",
+      employeeOptions: [
+        ["", "اختر حجم المنشأة"], ["1-10", "1-10 موظفين"], ["11-50", "11-50 موظف"],
+        ["51-200", "51-200 موظف"], ["201-500", "201-500 موظف"], ["500+", "أكثر من 500 موظف"]
+      ],
+      frameworks: [
+        ["ECC,ECC-1", "ECC", "الضوابط الأساسية للأمن السيبراني"],
+        ["NIST", "NIST", "NIST SP 800-53"],
+        ["ISO,ISO-1", "ISO", "ISO 27001"],
+        ["CSCC,CSCC-1", "CSCC", "ضوابط أمن الحوسبة السحابية"],
+        ["TCC,TCC-1", "TCC", "ضوابط الأنظمة الحساسة"],
+        ["DCC,DCC-1", "DCC", "ضوابط مراكز البيانات"],
+        ["OSMACC,OSMACC-1", "OSMACC", "ضوابط وسائل التواصل الاجتماعي للجهات"],
+        ["CCC-P,CCC-P-1,CCC-T,CCC-T-1", "CCC", "ضوابط الحوسبة السحابية (مزود/مستأجر)"]
+      ],
+      policyTypes: [
+        ["Access Control Policy", "التحكم بالوصول", "Access Control"],
+        ["General Information Security Policy", "أمن المعلومات العامة", ""],
+        ["Incident Response Policy", "الاستجابة للحوادث", ""],
+        ["Risk Management Policy", "إدارة المخاطر", ""],
+        ["Encryption and Data Protection Policy", "التشفير وحماية البيانات", ""],
+        ["Business Continuity Policy", "استمرارية الأعمال", ""]
+      ]
+    },
+    en: {
+      pageTitle: "Cybersecurity Policy Generator",
+      brand: "Policy Generator",
+      navHome: "Home", navGenerate: "Generate Policies", navDashboard: "Admin Dashboard", navCta: "Get Started",
+      heroTitle: "Generate Your Cybersecurity Policies",
+      heroSub: "Provide information about your organization to generate customized policies grounded in the standards and regulatory bodies you select, ready to download as a branded PDF.",
+      cfgToggle: "Connection Settings",
+      cfgLabel: "Generation Endpoint (Vercel)",
+      cfgHint: "This URL points to the serverless function that runs semantic search over the controls database and generates policies via GPT-4o. The response must include a field named policies (array).",
+      orgInfoTitle: "Organization Information",
+      orgInfoSub: "Tell us about your organization so we can create policies tailored to your specific needs",
+      companyNameLabel: "Organization Name *",
+      industryLabel: "Industry *",
+      employeeCountLabel: "Number of Employees *",
+      contactEmailLabel: "Contact Email *",
+      businessActivitiesLabel: "Primary Business Activities *",
+      dataTypesLabel: "Types of Data Handled *",
+      jurisdictionLabel: "Country",
+      jurisdictionValue: "Saudi Arabia",
+      frameworksTitle: "Regulatory & Legislative Bodies",
+      frameworksSub: "Select one or more bodies so policies are built on their approved controls",
+      policiesTitle: "Requested Policies",
+      policiesSub: "Select one or more policy types you need",
+      genLanguageLabel: "Generated Policy Language",
+      langOptAr: "Arabic", langOptEn: "English", langOptBoth: "Arabic & English",
+      notesLabel: "Additional Notes (optional)",
+      outputModeTitle: "File Output Mode",
+      outputSeparateTitle: "Separate file per policy",
+      outputSeparateDesc: "A standalone PDF is generated for each policy type you choose",
+      outputUnifiedTitle: "One unified file",
+      outputUnifiedDesc: "All selected policies are merged into a single PDF",
+      pdfCustomTitle: "Customize PDF",
+      logoLabel: "Organization Logo (optional)",
+      logoBtn: "Choose logo image",
+      pdfFontLabel: "Font used in the file",
+      submitBtn: "Generate Policies",
+      downloadAllBtn: "Download all files as PDF",
+      footerNote: "These drafts are generated automatically by a language model grounded in the selected controls and regulatory bodies. Review by a qualified security professional is recommended before adoption.",
+      industryOptions: [
+        ["", "Select industry"], ["gov", "Government"], ["finance", "Finance & Banking"],
+        ["health", "Healthcare"], ["education", "Education"], ["ict", "Telecom & IT"],
+        ["retail", "Retail & Commerce"], ["energy", "Energy & Utilities"], ["other", "Other (specify below)"]
+      ],
+      industryOtherPlaceholder: "Type your organization's industry",
+      employeeOptions: [
+        ["", "Select company size"], ["1-10", "1-10 employees"], ["11-50", "11-50 employees"],
+        ["51-200", "51-200 employees"], ["201-500", "201-500 employees"], ["500+", "500+ employees"]
+      ],
+      frameworks: [
+        ["ECC,ECC-1", "ECC", "Essential Cybersecurity Controls"],
+        ["NIST", "NIST", "NIST SP 800-53"],
+        ["ISO,ISO-1", "ISO", "ISO 27001"],
+        ["CSCC,CSCC-1", "CSCC", "Cloud Cybersecurity Controls"],
+        ["TCC,TCC-1", "TCC", "Critical Systems Controls"],
+        ["DCC,DCC-1", "DCC", "Data Center Controls"],
+        ["OSMACC,OSMACC-1", "OSMACC", "Social Media Account Controls"],
+        ["CCC-P,CCC-P-1,CCC-T,CCC-T-1", "CCC", "Cloud Computing Controls (Provider/Tenant)"]
+      ],
+      policyTypes: [
+        ["Access Control Policy", "Access Control", ""],
+        ["General Information Security Policy", "General Information Security", ""],
+        ["Incident Response Policy", "Incident Response", ""],
+        ["Risk Management Policy", "Risk Management", ""],
+        ["Encryption and Data Protection Policy", "Encryption & Data Protection", ""],
+        ["Business Continuity Policy", "Business Continuity", ""]
+      ]
+    }
+  };
+
+  let siteLang = 'ar';
+
+  function buildOptions(selectEl, options) {
+    selectEl.innerHTML = options.map(([val, label]) => `<option value="${val}">${label}</option>`).join('');
+  }
+
+  function buildCheckGrid(gridEl, items, checkedValues) {
+    gridEl.innerHTML = items.map(([value, title, sub]) => `
+      <label class="check-item${checkedValues.includes(value) ? ' checked' : ''}">
+        <input type="checkbox" value="${value}" ${checkedValues.includes(value) ? 'checked' : ''}>
+        <span class="lbl"><b>${title}</b>${sub ? `<span>${sub}</span>` : ''}</span>
+      </label>
+    `).join('');
+    gridEl.querySelectorAll('.check-item').forEach(item => {
+      const input = item.querySelector('input');
+      input.addEventListener('change', () => item.classList.toggle('checked', input.checked));
+    });
+  }
+
+  function applyLanguage(lang) {
+    siteLang = lang;
+    const t = translations[lang];
+    document.getElementById('htmlRoot').lang = lang;
+    document.getElementById('htmlRoot').dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('pageTitle').textContent = t.pageTitle;
+    document.title = t.pageTitle;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.textContent = t[key];
+    });
+
+    document.getElementById('langArBtn').classList.toggle('active', lang === 'ar');
+    document.getElementById('langEnBtn').classList.toggle('active', lang === 'en');
+
+    // Rebuild dynamic option lists, preserving current selections where possible
+    const prevFrameworks = getChecked('frameworkGrid');
+    const prevPolicyTypes = getChecked('policyTypeGrid');
+    const prevIndustry = document.getElementById('industry').value;
+    const prevEmployee = document.getElementById('employeeCount').value;
+
+    buildOptions(document.getElementById('industry'), t.industryOptions);
+    buildOptions(document.getElementById('employeeCount'), t.employeeOptions);
+    document.getElementById('industryOther').placeholder = t.industryOtherPlaceholder;
+    document.getElementById('jurisdiction').value = t.jurisdictionValue;
+
+    buildCheckGrid(document.getElementById('frameworkGrid'), t.frameworks, prevFrameworks);
+    buildCheckGrid(document.getElementById('policyTypeGrid'), t.policyTypes, prevPolicyTypes);
+
+    if ([...document.getElementById('industry').options].some(o => o.value === prevIndustry)) {
+      document.getElementById('industry').value = prevIndustry;
+    }
+    if ([...document.getElementById('employeeCount').options].some(o => o.value === prevEmployee)) {
+      document.getElementById('employeeCount').value = prevEmployee;
+    }
+  }
+
+  document.getElementById('langArBtn').addEventListener('click', () => applyLanguage('ar'));
+  document.getElementById('langEnBtn').addEventListener('click', () => applyLanguage('en'));
+
+  // Initial build
+  applyLanguage('ar');
+
   const cfgToggle = document.getElementById('cfgToggle');
   const cfgPanel = document.getElementById('cfgPanel');
   cfgToggle.addEventListener('click', () => cfgPanel.classList.toggle('open'));
 
-  // ⚠️ عدّل هذا الرابط ليطابق رابط الـ Webhook الفعلي من سير عمل n8n الخاص بك.
-  // يمكن أيضاً لصقه من واجهة "إعداد الاتصال" أثناء الاختبار.
-  
+  // ⚠️ عدّل هذا الرابط ليطابق رابط دالة Vercel الفعلي الخاص بك.
   let WEBHOOK_URL = "https://policy-rag-alpha.vercel.app/api/generate-policy";
   const webhookInput = document.getElementById('webhookUrl');
   webhookInput.value = WEBHOOK_URL;
   webhookInput.addEventListener('input', () => { WEBHOOK_URL = webhookInput.value.trim(); });
 
+  const industrySelect = document.getElementById('industry');
+  const industryOther = document.getElementById('industryOther');
+  industrySelect.addEventListener('change', () => {
+    const isOther = industrySelect.value === 'other';
+    industryOther.style.display = isOther ? 'block' : 'none';
+    industryOther.required = isOther;
+  });
+
+  document.querySelectorAll('#outputModeRow .radio-card').forEach(card => {
+    const input = card.querySelector('input');
+    input.addEventListener('change', () => {
+      document.querySelectorAll('#outputModeRow .radio-card').forEach(c => c.classList.remove('checked'));
+      card.classList.add('checked');
+    });
+  });
+
+  let logoDataUrl = null;
+  const logoBtn = document.getElementById('logoBtn');
+  const logoInput = document.getElementById('logoInput');
+  const logoPreview = document.getElementById('logoPreview');
+  logoBtn.addEventListener('click', () => logoInput.click());
+  logoInput.addEventListener('change', () => {
+    const file = logoInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      logoDataUrl = reader.result;
+      logoPreview.innerHTML = `<img src="${logoDataUrl}"> ${file.name}`;
+    };
+    reader.readAsDataURL(file);
+  });
+
   const form = document.getElementById('policyForm');
   const submitBtn = document.getElementById('submitBtn');
   const statusMsg = document.getElementById('statusMsg');
   const resultBlock = document.getElementById('resultBlock');
-  const docOutput = document.getElementById('docOutput');
+  const resultList = document.getElementById('resultList');
+
+  let lastPolicies = [];
+  let lastMeta = {};
+
+  function getChecked(gridId) {
+    return Array.from(document.querySelectorAll(`#${gridId} input:checked`)).map(i => i.value);
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     statusMsg.classList.remove('show');
 
-    if (!WEBHOOK_URL || WEBHOOK_URL.includes('YOUR-N8N-INSTANCE')) {
-      statusMsg.textContent = 'الرجاء إدخال رابط Webhook صحيح من إعداد الاتصال أعلاه.';
+    if (!WEBHOOK_URL) {
+      statusMsg.textContent = siteLang === 'ar' ? 'الرجاء إدخال رابط صحيح من إعداد الاتصال أعلاه.' : 'Please enter a valid endpoint URL in Connection Settings above.';
       statusMsg.classList.add('show');
       cfgPanel.classList.add('open');
       return;
     }
 
+    const frameworkValues = getChecked('frameworkGrid');
+    const frameworks = frameworkValues.flatMap(v => v.split(','));
+    const policyTypeCodes = getChecked('policyTypeGrid'); // canonical English codes, e.g. "Access Control Policy"
+    const outputMode = document.querySelector('#outputModeRow input:checked').value;
+
+    if (policyTypeCodes.length === 0) {
+      statusMsg.textContent = siteLang === 'ar' ? 'الرجاء اختيار نوع سياسة واحد على الأقل.' : 'Please select at least one policy type.';
+      statusMsg.classList.add('show');
+      return;
+    }
+    if (frameworks.length === 0) {
+      statusMsg.textContent = siteLang === 'ar' ? 'الرجاء اختيار جهة تنظيمية واحدة على الأقل.' : 'Please select at least one regulatory body.';
+      statusMsg.classList.add('show');
+      return;
+    }
+
+    // Map industry code -> display label in the currently generated-policy language for the prompt
+    const t = translations[siteLang];
+    const industryLabelMap = Object.fromEntries(t.industryOptions);
+    const industryValue = industrySelect.value === 'other' ? industryOther.value : (industryLabelMap[industrySelect.value] || industrySelect.value);
+
+    // Map policy type codes to display labels matching the *generated policy* language selection
+    const genLang = document.getElementById('language').value; // "ar" | "en" | "both"
+    const policyLabelLang = genLang === 'en' ? translations.en : translations.ar;
+    const policyLabelMap = Object.fromEntries(policyLabelLang.policyTypes.map(([code, label]) => [code, label]));
+    const policyTypes = policyTypeCodes.map(code => policyLabelMap[code] || code);
+
     const payload = {
-      policyType: document.getElementById('policyType').value,
       companyName: document.getElementById('companyName').value,
-      industry: document.getElementById('industry').value,
+      industry: industryValue,
       jurisdiction: document.getElementById('jurisdiction').value,
-      language: document.getElementById('language').value,
-      notes: document.getElementById('notes').value
+      employeeCount: document.getElementById('employeeCount').value,
+      contactEmail: document.getElementById('contactEmail').value,
+      businessActivities: document.getElementById('businessActivities').value,
+      dataTypes: document.getElementById('dataTypes').value,
+      language: genLang,
+      notes: document.getElementById('notes').value,
+      frameworks,
+      policyTypes,
+      outputMode
     };
+
+    lastMeta = payload;
 
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
-    submitBtn.querySelector('.btn-label').textContent = 'جاري التوليد...';
+    submitBtn.querySelector('.btn-label').textContent = siteLang === 'ar' ? 'جاري التوليد...' : 'Generating...';
     resultBlock.classList.remove('show');
+    resultList.innerHTML = '';
 
     try {
       const res = await fetch(WEBHOOK_URL, {
@@ -342,46 +654,122 @@
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error('فشل الاتصال بالخادم (رمز: ' + res.status + ')');
+      if (!res.ok) throw new Error((siteLang === 'ar' ? 'فشل الاتصال بالخادم (رمز: ' : 'Server request failed (code: ') + res.status + ')');
 
       const data = await res.json();
-      // يدعم عدة أشكال شائعة لاستجابة n8n / ChatGPT
-      const text = data.policy || data.output || data.text || data.message ||
-                   (Array.isArray(data) && (data[0]?.policy || data[0]?.output || data[0]?.text)) ||
-                   JSON.stringify(data, null, 2);
+      const policies = data.policies || (data.policy ? [{ policyType: policyTypes[0], content: data.policy }] : []);
+      if (!policies.length) throw new Error(siteLang === 'ar' ? 'لم يتم استلام أي سياسة من الخادم.' : 'No policy was returned by the server.');
 
-      docOutput.textContent = text;
+      lastPolicies = policies;
+      renderResults(policies);
       resultBlock.classList.add('show');
       resultBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     } catch (err) {
-      statusMsg.textContent = 'تعذّر توليد السياسة: ' + err.message + '. تأكد من صحة رابط Webhook وأن CORS مفعّل في n8n.';
+      statusMsg.textContent = (siteLang === 'ar' ? 'تعذّر توليد السياسة: ' : 'Could not generate policy: ') + err.message;
       statusMsg.classList.add('show');
     } finally {
       submitBtn.disabled = false;
       submitBtn.classList.remove('loading');
-      submitBtn.querySelector('.btn-label').textContent = 'توليد السياسة';
+      submitBtn.querySelector('.btn-label').textContent = translations[siteLang].submitBtn;
     }
   });
 
-  document.getElementById('copyBtn').addEventListener('click', () => {
-    navigator.clipboard.writeText(docOutput.textContent).then(() => {
-      const btn = document.getElementById('copyBtn');
-      const original = btn.textContent;
-      btn.textContent = 'تم النسخ ✓';
-      setTimeout(() => { btn.textContent = original; }, 1600);
+  function renderResults(policies) {
+    resultList.innerHTML = '';
+    const copyLabel = siteLang === 'ar' ? 'نسخ النص' : 'Copy text';
+    const pdfLabel = siteLang === 'ar' ? 'تحميل PDF' : 'Download PDF';
+    const readyLabel = siteLang === 'ar' ? '✓ جاهزة' : '✓ Ready';
+    policies.forEach((p, idx) => {
+      const item = document.createElement('div');
+      item.className = 'result-item';
+      item.innerHTML = `
+        <div class="result-head">
+          <h3>${p.policyType} <span class="stamp">${readyLabel}</span></h3>
+          <div class="result-actions">
+            <button class="icon-btn copy-btn" data-idx="${idx}">${copyLabel}</button>
+            <button class="icon-btn primary pdf-btn" data-idx="${idx}">${pdfLabel}</button>
+          </div>
+        </div>
+        <div class="doc">${escapeHtml(p.content)}</div>
+      `;
+      resultList.appendChild(item);
     });
+
+    resultList.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(lastPolicies[btn.dataset.idx].content).then(() => {
+          const original = btn.textContent;
+          btn.textContent = siteLang === 'ar' ? 'تم النسخ ✓' : 'Copied ✓';
+          setTimeout(() => { btn.textContent = original; }, 1600);
+        });
+      });
+    });
+    resultList.querySelectorAll('.pdf-btn').forEach(btn => {
+      btn.addEventListener('click', () => downloadPdf([lastPolicies[btn.dataset.idx]], lastPolicies[btn.dataset.idx].policyType));
+    });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  document.getElementById('downloadAllBtn').addEventListener('click', () => {
+    const outputMode = document.querySelector('#outputModeRow input:checked').value;
+    if (outputMode === 'unified' || lastPolicies.length === 1) {
+      downloadPdf(lastPolicies, lastPolicies[0]?.policyType || 'policies');
+    } else {
+      lastPolicies.reduce((chain, p) => chain.then(() => downloadPdf([p], p.policyType)), Promise.resolve());
+    }
   });
 
-  document.getElementById('downloadBtn').addEventListener('click', () => {
-    const blob = new Blob([docOutput.textContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'policy.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
+  function downloadPdf(policies, filenameLabel) {
+    const template = document.getElementById('pdfTemplate');
+    const font = document.getElementById('pdfFont').value;
+    template.style.fontFamily = font;
+    template.style.direction = siteLang === 'ar' ? 'rtl' : 'ltr';
+
+    document.getElementById('pdfTitleCompany').textContent = lastMeta.companyName || (siteLang === 'ar' ? 'وثيقة سياسات أمن المعلومات' : 'Information Security Policy Document');
+    const logoImg = document.getElementById('pdfLogoImg');
+    if (logoDataUrl) {
+      logoImg.src = logoDataUrl;
+      logoImg.style.display = 'block';
+    } else {
+      logoImg.style.display = 'none';
+    }
+
+    const metaLabels = siteLang === 'ar'
+      ? { industry: 'القطاع', country: 'الدولة', date: 'تاريخ الإصدار' }
+      : { industry: 'Industry', country: 'Country', date: 'Issue Date' };
+
+    document.getElementById('pdfMeta').innerHTML = [
+      `${metaLabels.industry}: ${lastMeta.industry || '-'}`,
+      `${metaLabels.country}: ${lastMeta.jurisdiction || '-'}`,
+      `${metaLabels.date}: ${new Date().toLocaleDateString(siteLang === 'ar' ? 'ar-SA' : 'en-US')}`
+    ].join(' &nbsp;|&nbsp; ');
+
+    const sectionsEl = document.getElementById('pdfSections');
+    sectionsEl.innerHTML = policies.map(p => `
+      <div class="pdf-section-title">${p.policyType}</div>
+      <div class="pdf-body">${escapeHtml(p.content)}</div>
+    `).join('');
+
+    return new Promise((resolve) => {
+      html2pdf()
+        .set({
+          margin: 0,
+          filename: `${(filenameLabel || 'policy').replace(/\s+/g, '_')}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+        })
+        .from(template)
+        .save()
+        .then(resolve);
+    });
+  }
 </script>
 </body>
 </html>
