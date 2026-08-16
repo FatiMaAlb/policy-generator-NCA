@@ -266,12 +266,14 @@
   }
 
   #pdfTemplate .pdf-policy{
-    width:794px;
-    padding:55px 60px;
+    width:100%;
+    max-width:794px;
+    margin:0;
+    padding:55px 52px;
     box-sizing:border-box;
     background:#fff;
-    break-inside:auto;
-    page-break-inside:auto;
+    display:block;
+    position:relative;
   }
 
   #pdfTemplate .pdf-header{
@@ -297,9 +299,16 @@
   }
 
   #pdfTemplate .pdf-section{
-    margin-bottom:26px;
-    break-inside:auto;
-    page-break-inside:auto;
+    display:block;
+    width:100%;
+    margin:0 0 24px 0;
+    padding:0;
+    break-inside:auto !important;
+    page-break-inside:auto !important;
+    break-before:auto !important;
+    page-break-before:auto !important;
+    break-after:auto !important;
+    page-break-after:auto !important;
   }
 
   #pdfTemplate .pdf-section-title{
@@ -314,19 +323,29 @@
   }
 
   #pdfTemplate .pdf-body{
+    display:block;
+    width:100%;
+    max-width:none;
+    box-sizing:border-box;
     font-size:13px;
-    line-height:1.85;
+    line-height:1.75;
     white-space:pre-wrap;
     color:#1E293B;
-    overflow-wrap:break-word;
+    overflow-wrap:anywhere;
     word-break:normal;
-    break-inside:auto;
-    page-break-inside:auto;
+    direction:inherit;
+    text-align:inherit;
+    break-inside:auto !important;
+    page-break-inside:auto !important;
+    break-before:auto !important;
+    page-break-before:auto !important;
+    break-after:auto !important;
+    page-break-after:auto !important;
   }
 
   #pdfTemplate .pdf-section-title + .pdf-body{
-    break-before:avoid;
-    page-break-before:avoid;
+    break-before:auto;
+    page-break-before:auto;
   }
 </style>
 </head>
@@ -1110,8 +1129,7 @@
           backgroundColor: '#ffffff',
           logging: false,
           scrollX: 0,
-          scrollY: 0,
-          windowWidth: 794
+          scrollY: 0
         },
         jsPDF: {
           unit: 'pt',
