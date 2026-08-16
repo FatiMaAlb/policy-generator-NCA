@@ -123,11 +123,15 @@
   .icon-btn:hover{border-color:var(--blue);color:var(--blue);}
   .icon-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
   .icon-btn.primary:hover{background:var(--blue-dark);}
-  .doc{background:#F8FAFC;border:1px solid var(--line);border-inline-start:3px solid var(--blue);padding:24px 26px;border-radius:8px;white-space:pre-wrap;font-size:14px;line-height:1.9;color:var(--ink);max-height:420px;overflow-y:auto;}
+  .doc{background:#F8FAFC;border:1px solid var(--line);border-inline-start:3px solid var(--blue);padding:24px 26px;border-radius:8px;font-size:14px;line-height:1.9;color:var(--ink);max-height:420px;overflow-y:auto;}
+  .doc-section-title{font-weight:700;color:var(--blue-dark);font-size:14.5px;margin:18px 0 8px;}
+  .doc-section-title:first-child{margin-top:0;}
+  .doc-section-body{white-space:pre-wrap;}
 
   footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;}
 
-  #pdfTemplate{position:fixed;top:0;left:0;width:760px;background:#fff;padding:50px 55px;z-index:-9999;}
+  #pdfClipHost{position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;}
+  #pdfTemplate{width:760px;background:#fff;padding:50px 55px;}
   #pdfTemplate .pdf-cover{min-height:900px;display:flex;flex-direction:column;}
   #pdfTemplate .pdf-cover-top{display:flex;justify-content:space-between;align-items:flex-start;}
   #pdfTemplate .pdf-classification{border:1px solid #1D4ED8;color:#1D4ED8;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;display:inline-block;}
@@ -335,19 +339,21 @@
     <footer data-i18n="footerNote"></footer>
   </div>
 
-  <div id="pdfTemplate">
-    <div class="pdf-cover" id="pdfCover">
-      <div class="pdf-cover-top">
-        <span class="pdf-classification" id="pdfClassificationBadge"></span>
-        <img class="pdf-logo-box" id="pdfLogoImg" style="display:none;">
+  <div id="pdfClipHost">
+    <div id="pdfTemplate">
+      <div class="pdf-cover" id="pdfCover">
+        <div class="pdf-cover-top">
+          <span class="pdf-classification" id="pdfClassificationBadge"></span>
+          <img class="pdf-logo-box" id="pdfLogoImg" style="display:none;">
+        </div>
+        <div class="pdf-cover-title" id="pdfCoverTitle"></div>
+        <div class="pdf-cover-org" id="pdfCoverOrg"></div>
+        <div class="pdf-cover-meta" id="pdfCoverMeta"></div>
       </div>
-      <div class="pdf-cover-title" id="pdfCoverTitle"></div>
-      <div class="pdf-cover-org" id="pdfCoverOrg"></div>
-      <div class="pdf-cover-meta" id="pdfCoverMeta"></div>
+      <div id="pdfDocControl"></div>
+      <div id="pdfToc"></div>
+      <div id="pdfBodyPages"></div>
     </div>
-    <div id="pdfDocControl"></div>
-    <div id="pdfToc"></div>
-    <div id="pdfBodyPages"></div>
   </div>
 
 <script>
@@ -730,12 +736,23 @@
     }
   });
 
+  function contentLangDict(genLang) {
+    return genLang === 'en' ? translations.en : translations.ar;
+  }
+
   function renderResults(policies) {
     resultList.innerHTML = '';
     const copyLabel = siteLang === 'ar' ? 'نسخ النص' : 'Copy text';
     const pdfLabel = siteLang === 'ar' ? 'تحميل PDF' : 'Download PDF';
     const readyLabel = siteLang === 'ar' ? '✓ جاهزة' : '✓ Ready';
+    const cl = contentLangDict(lastMeta.language);
     policies.forEach((p, idx) => {
+      const sections = parseSections(p.content);
+      const bodyHtml = sections.map(s => {
+        const label = s.name ? (cl.sectionLabels[s.name] || s.name) : '';
+        return (label ? `<div class="doc-section-title">${label}</div>` : '') + `<div class="doc-section-body">${escapeHtml(s.body)}</div>`;
+      }).join('');
+
       const item = document.createElement('div');
       item.className = 'result-item';
       item.innerHTML = `
@@ -746,7 +763,7 @@
             <button class="icon-btn primary pdf-btn" data-idx="${idx}">${pdfLabel}</button>
           </div>
         </div>
-        <div class="doc">${escapeHtml(p.content)}</div>
+        <div class="doc">${bodyHtml}</div>
       `;
       resultList.appendChild(item);
     });
@@ -807,15 +824,16 @@
   }
 
   async function downloadPdf(policies, filenameLabel) {
-    const t = translations[siteLang];
-    const pl = t.pdfLabels;
+    const cl = contentLangDict(lastMeta.language); // the PDF body must match the *generated* language, not the site UI language
+    const pl = cl.pdfLabels;
+    const docLang = lastMeta.language === 'en' ? 'en' : 'ar';
     const font = document.getElementById('pdfFont').value;
     const template = document.getElementById('pdfTemplate');
     template.style.fontFamily = font;
-    template.style.direction = siteLang === 'ar' ? 'rtl' : 'ltr';
+    template.style.direction = docLang === 'ar' ? 'rtl' : 'ltr';
 
     const classificationVal = document.getElementById('classification').value || 'Public';
-    const classificationMap = Object.fromEntries(t.classificationOptions);
+    const classificationMap = Object.fromEntries(cl.classificationOptions);
     document.getElementById('pdfClassificationBadge').textContent = classificationMap[classificationVal] || classificationVal;
 
     const logoImg = document.getElementById('pdfLogoImg');
@@ -827,14 +845,14 @@
       logoImg.style.display = 'none';
     }
 
-    const orgName = lastMeta.companyName || (siteLang === 'ar' ? 'المنشأة' : 'Organization');
-    const coverTitle = policies.length === 1 ? policies[0].policyType : (siteLang === 'ar' ? 'وثيقة سياسات أمن المعلومات' : 'Information Security Policy Document');
+    const orgName = lastMeta.companyName || (docLang === 'ar' ? 'المنشأة' : 'Organization');
+    const coverTitle = policies.length === 1 ? policies[0].policyType : (docLang === 'ar' ? 'وثيقة سياسات أمن المعلومات' : 'Information Security Policy Document');
     document.getElementById('pdfCoverTitle').textContent = coverTitle;
     document.getElementById('pdfCoverOrg').textContent = orgName;
 
-    const today = new Date().toLocaleDateString(siteLang === 'ar' ? 'ar-SA' : 'en-US');
+    const today = new Date().toLocaleDateString(docLang === 'ar' ? 'ar-SA' : 'en-US');
     const nextYear = new Date(); nextYear.setFullYear(nextYear.getFullYear() + 1);
-    const nextYearStr = nextYear.toLocaleDateString(siteLang === 'ar' ? 'ar-SA' : 'en-US');
+    const nextYearStr = nextYear.toLocaleDateString(docLang === 'ar' ? 'ar-SA' : 'en-US');
 
     document.getElementById('pdfCoverMeta').innerHTML = `
       <div>${pl.date}<b>${today}</b></div>
@@ -866,7 +884,7 @@
       tocHtml += `<div class="pdf-toc-item" style="font-weight:700;margin-top:10px;">${p.policyType}</div>`;
       bodyHtml += `<div class="pdf-header"><div class="pdf-header-title">${p.policyType}</div><div class="pdf-header-meta">${classificationMap[classificationVal] || classificationVal} • v1.0</div></div>`;
       sections.forEach((s) => {
-        const label = s.name ? (t.sectionLabels[s.name] || s.name) : '';
+        const label = s.name ? (cl.sectionLabels[s.name] || s.name) : '';
         if (label) tocHtml += `<div class="pdf-toc-item">${label}</div>`;
         if (label) bodyHtml += `<div class="pdf-section-title">${label}</div>`;
         bodyHtml += `<div class="pdf-body">${escapeHtml(s.body)}</div>`;
