@@ -127,12 +127,26 @@
 
   footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;}
 
-  #pdfTemplate{position:fixed;top:-99999px;left:-99999px;width:760px;background:#fff;padding:50px 55px;}
-  #pdfTemplate .pdf-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1D4ED8;padding-bottom:16px;margin-bottom:26px;}
-  #pdfTemplate .pdf-header img{max-height:60px;max-width:180px;}
-  #pdfTemplate .pdf-title{font-size:20px;font-weight:700;color:#0F172A;}
-  #pdfTemplate .pdf-meta{font-size:11px;color:#64748B;margin-bottom:22px;line-height:1.8;}
-  #pdfTemplate .pdf-section-title{font-size:16px;font-weight:700;color:#1D4ED8;margin:26px 0 10px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;}
+  #pdfTemplate{position:fixed;top:0;left:0;width:760px;background:#fff;padding:50px 55px;z-index:-9999;}
+  #pdfTemplate .pdf-cover{min-height:900px;display:flex;flex-direction:column;}
+  #pdfTemplate .pdf-cover-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  #pdfTemplate .pdf-classification{border:1px solid #1D4ED8;color:#1D4ED8;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;display:inline-block;}
+  #pdfTemplate .pdf-logo-box{max-height:70px;max-width:200px;}
+  #pdfTemplate .pdf-cover-title{font-size:30px;font-weight:700;color:#0F172A;margin:180px 0 8px;line-height:1.3;}
+  #pdfTemplate .pdf-cover-org{font-size:16px;color:#1D4ED8;font-weight:600;margin-bottom:60px;}
+  #pdfTemplate .pdf-cover-meta{border-top:1px solid #E2E8F0;padding-top:16px;font-size:12px;color:#64748B;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  #pdfTemplate .pdf-cover-meta b{display:block;color:#0F172A;font-size:13px;margin-top:2px;}
+  #pdfTemplate .pdf-page{margin-top:8px;}
+  #pdfTemplate .pdf-doc-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:22px;}
+  #pdfTemplate .pdf-doc-table th{background:#F1F5F9;color:#0F172A;text-align:start;padding:8px 10px;border:1px solid #E2E8F0;font-weight:600;}
+  #pdfTemplate .pdf-doc-table td{padding:8px 10px;border:1px solid #E2E8F0;color:#334155;}
+  #pdfTemplate .pdf-table-title{font-size:13px;font-weight:700;color:#0F172A;margin:20px 0 8px;}
+  #pdfTemplate .pdf-toc-item{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed #E2E8F0;color:#0F172A;}
+  #pdfTemplate .pdf-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1D4ED8;padding-bottom:14px;margin-bottom:8px;}
+  #pdfTemplate .pdf-header img{max-height:44px;max-width:150px;}
+  #pdfTemplate .pdf-header-title{font-size:15px;font-weight:700;color:#0F172A;}
+  #pdfTemplate .pdf-header-meta{font-size:10px;color:#94A3B8;}
+  #pdfTemplate .pdf-section-title{font-size:16px;font-weight:700;color:#1D4ED8;margin:24px 0 10px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;}
   #pdfTemplate .pdf-body{font-size:13px;line-height:2;white-space:pre-wrap;color:#1E293B;}
 </style>
 </head>
@@ -296,6 +310,10 @@
             </select>
           </div>
         </div>
+        <div class="field">
+          <label data-i18n="classificationLabel"></label>
+          <select id="classification"></select>
+        </div>
 
         <div class="submit-row">
           <button type="submit" class="btn-primary" id="submitBtn">
@@ -318,12 +336,18 @@
   </div>
 
   <div id="pdfTemplate">
-    <div class="pdf-header">
-      <div class="pdf-title" id="pdfTitleCompany"></div>
-      <img id="pdfLogoImg" style="display:none;">
+    <div class="pdf-cover" id="pdfCover">
+      <div class="pdf-cover-top">
+        <span class="pdf-classification" id="pdfClassificationBadge"></span>
+        <img class="pdf-logo-box" id="pdfLogoImg" style="display:none;">
+      </div>
+      <div class="pdf-cover-title" id="pdfCoverTitle"></div>
+      <div class="pdf-cover-org" id="pdfCoverOrg"></div>
+      <div class="pdf-cover-meta" id="pdfCoverMeta"></div>
     </div>
-    <div class="pdf-meta" id="pdfMeta"></div>
-    <div id="pdfSections"></div>
+    <div id="pdfDocControl"></div>
+    <div id="pdfToc"></div>
+    <div id="pdfBodyPages"></div>
   </div>
 
 <script>
@@ -367,6 +391,7 @@
       logoLabel: "شعار المؤسسة (اختياري)",
       logoBtn: "اختر صورة الشعار",
       pdfFontLabel: "الخط المستخدم في الملف",
+      classificationLabel: "تصنيف المستند",
       submitBtn: "توليد السياسات",
       downloadAllBtn: "تحميل جميع الملفات كـ PDF",
       footerNote: "هذه المسودات تُنتج آلياً عبر نموذج لغوي مبني على الضوابط والجهات التنظيمية المختارة، ويُنصح بمراجعتها من قِبل مختص أمن معلومات قبل الاعتماد.",
@@ -397,7 +422,21 @@
         ["Risk Management Policy", "إدارة المخاطر", ""],
         ["Encryption and Data Protection Policy", "التشفير وحماية البيانات", ""],
         ["Business Continuity Policy", "استمرارية الأعمال", ""]
-      ]
+      ],
+      classificationOptions: [
+        ["Public", "عام"], ["Internal", "داخلي"], ["Confidential", "سري"], ["Top Secret", "سري للغاية"]
+      ],
+      sectionLabels: {
+        Purpose: "الغرض", Scope: "النطاق", "Policy Statements": "بنود السياسة",
+        "Roles and Responsibilities": "الأدوار والمسؤوليات", "Update and Review": "التحديث والمراجعة", Compliance: "الامتثال"
+      },
+      pdfLabels: {
+        industry: "القطاع", country: "الدولة", date: "تاريخ الإصدار", version: "الإصدار",
+        docControlTitle: "ضبط الوثيقة", versionCol: "الإصدار", dateCol: "التاريخ", detailsCol: "التفاصيل",
+        reviewTitle: "جدول المراجعة", reviewRate: "معدل المراجعة الدورية", reviewRateVal: "مرة واحدة سنوياً",
+        lastReview: "تاريخ آخر مراجعة", nextReview: "تاريخ المراجعة القادمة",
+        tocTitle: "جدول المحتويات", initialVersion: "الإصدار الأولي - تم إنشاؤه آلياً"
+      }
     },
     en: {
       pageTitle: "Cybersecurity Policy Generator",
@@ -434,6 +473,7 @@
       logoLabel: "Organization Logo (optional)",
       logoBtn: "Choose logo image",
       pdfFontLabel: "Font used in the file",
+      classificationLabel: "Document Classification",
       submitBtn: "Generate Policies",
       downloadAllBtn: "Download all files as PDF",
       footerNote: "These drafts are generated automatically by a language model grounded in the selected controls and regulatory bodies. Review by a qualified security professional is recommended before adoption.",
@@ -464,7 +504,21 @@
         ["Risk Management Policy", "Risk Management", ""],
         ["Encryption and Data Protection Policy", "Encryption & Data Protection", ""],
         ["Business Continuity Policy", "Business Continuity", ""]
-      ]
+      ],
+      classificationOptions: [
+        ["Public", "Public"], ["Internal", "Internal"], ["Confidential", "Confidential"], ["Top Secret", "Top Secret"]
+      ],
+      sectionLabels: {
+        Purpose: "Purpose", Scope: "Scope", "Policy Statements": "Policy Statements",
+        "Roles and Responsibilities": "Roles and Responsibilities", "Update and Review": "Update and Review", Compliance: "Compliance"
+      },
+      pdfLabels: {
+        industry: "Industry", country: "Country", date: "Issue Date", version: "Version",
+        docControlTitle: "Document Control", versionCol: "Version", dateCol: "Date", detailsCol: "Details",
+        reviewTitle: "Review Table", reviewRate: "Periodical Review Rate", reviewRateVal: "Once a year",
+        lastReview: "Last Review Date", nextReview: "Upcoming Review Date",
+        tocTitle: "Table of Contents", initialVersion: "Initial version - auto-generated"
+      }
     }
   };
 
@@ -511,6 +565,7 @@
 
     buildOptions(document.getElementById('industry'), t.industryOptions);
     buildOptions(document.getElementById('employeeCount'), t.employeeOptions);
+    buildOptions(document.getElementById('classification'), t.classificationOptions);
     document.getElementById('industryOther').placeholder = t.industryOtherPlaceholder;
     document.getElementById('jurisdiction').value = t.jurisdictionValue;
 
@@ -725,50 +780,121 @@
     }
   });
 
-  function downloadPdf(policies, filenameLabel) {
-    const template = document.getElementById('pdfTemplate');
+  // Parses generated content into sections keyed by the six mandatory
+  // "## " markers the backend is instructed to always emit in English.
+  function parseSections(content) {
+    const markerNames = ["Purpose", "Scope", "Policy Statements", "Roles and Responsibilities", "Update and Review", "Compliance"];
+    const regex = new RegExp(`##\\s*(${markerNames.join('|')})\\s*\\n`, 'g');
+    const parts = [];
+    let match, lastIndex = 0, lastName = null;
+    while ((match = regex.exec(content)) !== null) {
+      if (lastName) parts.push({ name: lastName, body: content.slice(lastIndex, match.index).trim() });
+      lastName = match[1];
+      lastIndex = regex.lastIndex;
+    }
+    if (lastName) parts.push({ name: lastName, body: content.slice(lastIndex).trim() });
+    // Fallback: if no markers were found at all, treat the whole thing as one unlabeled section
+    if (parts.length === 0) parts.push({ name: null, body: content.trim() });
+    return parts;
+  }
+
+  function waitForImage(img) {
+    return new Promise((resolve) => {
+      if (!img.src || img.complete) return resolve();
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+    });
+  }
+
+  async function downloadPdf(policies, filenameLabel) {
+    const t = translations[siteLang];
+    const pl = t.pdfLabels;
     const font = document.getElementById('pdfFont').value;
+    const template = document.getElementById('pdfTemplate');
     template.style.fontFamily = font;
     template.style.direction = siteLang === 'ar' ? 'rtl' : 'ltr';
 
-    document.getElementById('pdfTitleCompany').textContent = lastMeta.companyName || (siteLang === 'ar' ? 'وثيقة سياسات أمن المعلومات' : 'Information Security Policy Document');
+    const classificationVal = document.getElementById('classification').value || 'Public';
+    const classificationMap = Object.fromEntries(t.classificationOptions);
+    document.getElementById('pdfClassificationBadge').textContent = classificationMap[classificationVal] || classificationVal;
+
     const logoImg = document.getElementById('pdfLogoImg');
     if (logoDataUrl) {
       logoImg.src = logoDataUrl;
       logoImg.style.display = 'block';
     } else {
+      logoImg.removeAttribute('src');
       logoImg.style.display = 'none';
     }
 
-    const metaLabels = siteLang === 'ar'
-      ? { industry: 'القطاع', country: 'الدولة', date: 'تاريخ الإصدار' }
-      : { industry: 'Industry', country: 'Country', date: 'Issue Date' };
+    const orgName = lastMeta.companyName || (siteLang === 'ar' ? 'المنشأة' : 'Organization');
+    const coverTitle = policies.length === 1 ? policies[0].policyType : (siteLang === 'ar' ? 'وثيقة سياسات أمن المعلومات' : 'Information Security Policy Document');
+    document.getElementById('pdfCoverTitle').textContent = coverTitle;
+    document.getElementById('pdfCoverOrg').textContent = orgName;
 
-    document.getElementById('pdfMeta').innerHTML = [
-      `${metaLabels.industry}: ${lastMeta.industry || '-'}`,
-      `${metaLabels.country}: ${lastMeta.jurisdiction || '-'}`,
-      `${metaLabels.date}: ${new Date().toLocaleDateString(siteLang === 'ar' ? 'ar-SA' : 'en-US')}`
-    ].join(' &nbsp;|&nbsp; ');
+    const today = new Date().toLocaleDateString(siteLang === 'ar' ? 'ar-SA' : 'en-US');
+    const nextYear = new Date(); nextYear.setFullYear(nextYear.getFullYear() + 1);
+    const nextYearStr = nextYear.toLocaleDateString(siteLang === 'ar' ? 'ar-SA' : 'en-US');
 
-    const sectionsEl = document.getElementById('pdfSections');
-    sectionsEl.innerHTML = policies.map(p => `
-      <div class="pdf-section-title">${p.policyType}</div>
-      <div class="pdf-body">${escapeHtml(p.content)}</div>
-    `).join('');
+    document.getElementById('pdfCoverMeta').innerHTML = `
+      <div>${pl.date}<b>${today}</b></div>
+      <div>${pl.version}<b>1.0</b></div>
+      <div>${pl.industry}<b>${lastMeta.industry || '-'}</b></div>
+    `;
 
-    return new Promise((resolve) => {
-      html2pdf()
-        .set({
-          margin: 0,
-          filename: `${(filenameLabel || 'policy').replace(/\s+/g, '_')}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-        })
-        .from(template)
-        .save()
-        .then(resolve);
+    // Document Control: version table + review table, mimicking the NCA template's structure
+    document.getElementById('pdfDocControl').innerHTML = `
+      <div class="pdf-page">
+        <div class="pdf-table-title">${pl.docControlTitle}</div>
+        <table class="pdf-doc-table">
+          <tr><th>${pl.versionCol}</th><th>${pl.dateCol}</th><th>${pl.detailsCol}</th></tr>
+          <tr><td>1.0</td><td>${today}</td><td>${pl.initialVersion}</td></tr>
+        </table>
+        <div class="pdf-table-title">${pl.reviewTitle}</div>
+        <table class="pdf-doc-table">
+          <tr><th>${pl.reviewRate}</th><th>${pl.lastReview}</th><th>${pl.nextReview}</th></tr>
+          <tr><td>${pl.reviewRateVal}</td><td>${today}</td><td>${nextYearStr}</td></tr>
+        </table>
+      </div>
+    `;
+
+    // Table of contents + body pages, one block per policy, each split into the six sections
+    let tocHtml = `<div class="pdf-page"><div class="pdf-table-title">${pl.tocTitle}</div>`;
+    let bodyHtml = '';
+    policies.forEach((p) => {
+      const sections = parseSections(p.content);
+      tocHtml += `<div class="pdf-toc-item" style="font-weight:700;margin-top:10px;">${p.policyType}</div>`;
+      bodyHtml += `<div class="pdf-header"><div class="pdf-header-title">${p.policyType}</div><div class="pdf-header-meta">${classificationMap[classificationVal] || classificationVal} • v1.0</div></div>`;
+      sections.forEach((s) => {
+        const label = s.name ? (t.sectionLabels[s.name] || s.name) : '';
+        if (label) tocHtml += `<div class="pdf-toc-item">${label}</div>`;
+        if (label) bodyHtml += `<div class="pdf-section-title">${label}</div>`;
+        bodyHtml += `<div class="pdf-body">${escapeHtml(s.body)}</div>`;
+      });
     });
+    tocHtml += `</div>`;
+    document.getElementById('pdfToc').innerHTML = tocHtml;
+    document.getElementById('pdfBodyPages').innerHTML = bodyHtml;
+
+    // Ensure the logo image (if any) and web fonts are fully loaded before html2canvas
+    // takes its snapshot - capturing too early is a common cause of a blank/partial PDF.
+    await waitForImage(logoImg);
+    if (document.fonts && document.fonts.ready) {
+      try { await document.fonts.ready; } catch (e) {}
+    }
+    await new Promise((r) => setTimeout(r, 60));
+
+    return html2pdf()
+      .set({
+        margin: 0,
+        filename: `${(filenameLabel || 'policy').replace(/\s+/g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+      })
+      .from(template)
+      .save();
   }
 </script>
 </body>
