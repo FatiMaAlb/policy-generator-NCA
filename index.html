@@ -130,6 +130,9 @@
 
   footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;}
 
+  /* =========================
+     PDF DOCUMENT LAYOUT
+     ========================= */
   #pdfClipHost{
     position:absolute;
     left:-10000px;
@@ -142,64 +145,208 @@
 
   #pdfTemplate{
     width:794px;
+    margin:0;
+    padding:0;
     background:#fff;
-    padding:48px 58px;
+    color:#1E293B;
     box-sizing:border-box;
-    overflow:visible;
+  }
+
+  #pdfTemplate .pdf-cover,
+  #pdfTemplate .pdf-doc-control-page,
+  #pdfTemplate .pdf-toc-page{
+    width:794px;
+    min-height:1123px;
+    height:1123px;
+    padding:55px 60px;
+    box-sizing:border-box;
+    background:#fff;
+    position:relative;
+    break-after:page;
+    page-break-after:always;
   }
 
   #pdfTemplate .pdf-cover{
-    height:698px;
-    min-height:698px;
     display:flex;
     flex-direction:column;
-    box-sizing:border-box;
-    break-after:page;
-    page-break-after:always;
-    break-before:auto;
-    page-break-before:auto;
   }
 
-  /* Structural pages: each section ends the page, but never starts with a
-     second break. This avoids the blank pages caused by break-before +
-     the previous block's break-after. */
-  #pdfTemplate .pdf-structural-page{
-    break-after:page;
-    page-break-after:always;
-    break-before:auto;
-    page-break-before:auto;
+  #pdfTemplate .pdf-cover-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+
+  #pdfTemplate .pdf-classification{
+    border:1px solid #1D4ED8;
+    color:#1D4ED8;
+    font-size:11px;
+    font-weight:700;
+    padding:4px 12px;
+    border-radius:100px;
+    display:inline-block;
+  }
+
+  #pdfTemplate .pdf-logo-box{
+    max-height:70px;
+    max-width:200px;
+    object-fit:contain;
+  }
+
+  #pdfTemplate .pdf-cover-title{
+    font-size:30px;
+    font-weight:700;
+    color:#0F172A;
+    margin:190px 0 10px;
+    line-height:1.35;
+  }
+
+  #pdfTemplate .pdf-cover-org{
+    font-size:17px;
+    color:#1D4ED8;
+    font-weight:600;
+    margin-bottom:auto;
+  }
+
+  #pdfTemplate .pdf-cover-meta{
+    border-top:1px solid #E2E8F0;
+    padding-top:18px;
+    font-size:12px;
+    color:#64748B;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:12px;
+  }
+
+  #pdfTemplate .pdf-cover-meta b{
+    display:block;
+    color:#0F172A;
+    font-size:13px;
+    margin-top:3px;
+  }
+
+  #pdfTemplate .pdf-table-title{
+    font-size:18px;
+    font-weight:700;
+    color:#0F172A;
+    margin:0 0 16px;
+  }
+
+  #pdfTemplate .pdf-doc-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:11.5px;
+    margin-bottom:30px;
+  }
+
+  #pdfTemplate .pdf-doc-table th{
+    background:#F1F5F9;
+    color:#0F172A;
+    text-align:start;
+    padding:9px 10px;
+    border:1px solid #E2E8F0;
+    font-weight:600;
+  }
+
+  #pdfTemplate .pdf-doc-table td{
+    padding:9px 10px;
+    border:1px solid #E2E8F0;
+    color:#334155;
+  }
+
+  #pdfTemplate .pdf-toc-item{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    padding:8px 0;
+    border-bottom:1px dashed #E2E8F0;
+    color:#0F172A;
     break-inside:avoid;
     page-break-inside:avoid;
   }
 
-  #pdfTemplate .pdf-page{
-    break-inside:auto;
-    page-break-inside:auto;
+  #pdfTemplate .pdf-policy{
+    width:100%;
+    max-width:794px;
+    margin:0;
+    padding:55px 52px;
+    box-sizing:border-box;
+    background:#fff;
+    display:block;
+    position:relative;
   }
 
-  #pdfTemplate .pdf-cover-top{display:flex;justify-content:space-between;align-items:flex-start;}
-  #pdfTemplate .pdf-classification{border:1px solid #1D4ED8;color:#1D4ED8;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;display:inline-block;}
-  #pdfTemplate .pdf-logo-box{max-height:70px;max-width:200px;}
-  #pdfTemplate .pdf-cover-title{font-size:30px;font-weight:700;color:#0F172A;margin:180px 0 8px;line-height:1.3;}
-  #pdfTemplate .pdf-cover-org{font-size:16px;color:#1D4ED8;font-weight:600;margin-bottom:60px;}
-  #pdfTemplate .pdf-cover-meta{border-top:1px solid #E2E8F0;padding-top:16px;font-size:12px;color:#64748B;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-  #pdfTemplate .pdf-cover-meta b{display:block;color:#0F172A;font-size:13px;margin-top:2px;}
-  #pdfTemplate .pdf-page{margin-top:8px;}
-  #pdfTemplate .pdf-doc-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:22px;}
-  #pdfTemplate .pdf-doc-table th{background:#F1F5F9;color:#0F172A;text-align:start;padding:8px 10px;border:1px solid #E2E8F0;font-weight:600;}
-  #pdfTemplate .pdf-doc-table td{padding:8px 10px;border:1px solid #E2E8F0;color:#334155;}
-  #pdfTemplate .pdf-table-title{font-size:13px;font-weight:700;color:#0F172A;margin:20px 0 8px;}
-  #pdfTemplate .pdf-toc-item{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed #E2E8F0;color:#0F172A;}
-  #pdfTemplate .pdf-header{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #1D4ED8;padding-bottom:14px;margin-bottom:8px;}
-  #pdfTemplate .pdf-header img{max-height:44px;max-width:150px;}
-  #pdfTemplate .pdf-header-title{font-size:15px;font-weight:700;color:#0F172A;}
-  #pdfTemplate .pdf-header-meta{font-size:10px;color:#94A3B8;}
-  #pdfTemplate .pdf-section{break-inside:auto;page-break-inside:auto;margin:0 0 18px;padding:0;}
-  #pdfTemplate .pdf-section-title{font-size:16px;font-weight:700;color:#1D4ED8;margin:18px 0 9px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;break-after:avoid;page-break-after:avoid;break-inside:avoid;page-break-inside:avoid;}
-  #pdfTemplate .pdf-body{font-size:13px;line-height:1.7;white-space:pre-wrap;color:#1E293B;width:100%;max-width:none;box-sizing:border-box;overflow-wrap:break-word;word-break:normal;unicode-bidi:normal;}
-  #pdfTemplate .pdf-inline-ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;}
-  #pdfTemplate[dir="rtl"] .pdf-body, #pdfTemplate[dir="rtl"] .pdf-section-title, #pdfTemplate[dir="rtl"] .pdf-header-title, #pdfTemplate[dir="rtl"] .pdf-header-meta, #pdfTemplate[dir="rtl"] .pdf-toc-item, #pdfTemplate[dir="rtl"] .pdf-table-title{direction:rtl;text-align:right;unicode-bidi:normal;}
-  #pdfTemplate[dir="ltr"] .pdf-body, #pdfTemplate[dir="ltr"] .pdf-section-title, #pdfTemplate[dir="ltr"] .pdf-header-title, #pdfTemplate[dir="ltr"] .pdf-header-meta, #pdfTemplate[dir="ltr"] .pdf-toc-item, #pdfTemplate[dir="ltr"] .pdf-table-title{direction:ltr;text-align:left;unicode-bidi:normal;}
+  #pdfTemplate .pdf-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:2px solid #1D4ED8;
+    padding-bottom:12px;
+    margin-bottom:22px;
+    break-after:avoid;
+    page-break-after:avoid;
+  }
+
+  #pdfTemplate .pdf-header-title{
+    font-size:15px;
+    font-weight:700;
+    color:#0F172A;
+  }
+
+  #pdfTemplate .pdf-header-meta{
+    font-size:10px;
+    color:#94A3B8;
+  }
+
+  #pdfTemplate .pdf-section{
+    display:block;
+    width:100%;
+    margin:0 0 24px 0;
+    padding:0;
+    break-inside:auto !important;
+    page-break-inside:auto !important;
+    break-before:auto !important;
+    page-break-before:auto !important;
+    break-after:auto !important;
+    page-break-after:auto !important;
+  }
+
+  #pdfTemplate .pdf-section-title{
+    font-size:16px;
+    font-weight:700;
+    color:#1D4ED8;
+    margin:0 0 10px;
+    border-bottom:1px solid #E2E8F0;
+    padding-bottom:6px;
+    break-after:avoid;
+    page-break-after:avoid;
+  }
+
+  #pdfTemplate .pdf-body{
+    display:block;
+    width:100%;
+    max-width:none;
+    box-sizing:border-box;
+    font-size:13px;
+    line-height:1.75;
+    white-space:pre-wrap;
+    color:#1E293B;
+    overflow-wrap:anywhere;
+    word-break:normal;
+    direction:inherit;
+    text-align:inherit;
+    break-inside:auto !important;
+    page-break-inside:auto !important;
+    break-before:auto !important;
+    page-break-before:auto !important;
+    break-after:auto !important;
+    page-break-after:auto !important;
+  }
+
+  #pdfTemplate .pdf-section-title + .pdf-body{
+    break-before:auto;
+    page-break-before:auto;
+  }
 </style>
 </head>
 <body>
@@ -745,6 +892,7 @@
       notes: document.getElementById('notes').value,
       frameworks,
       policyTypes,
+      policyTypeCodes, // stable English identifiers (e.g. "Access Control Policy") the server uses to keep retrieval on-topic, independent of display language
       outputMode
     };
 
@@ -871,39 +1019,21 @@
     });
   }
 
-  function formatPdfText(text, lang) {
-    let html = escapeHtml(text || '');
-    // Keep control references, URLs, acronyms and Latin fragments together
-    // inside Arabic paragraphs so the bidi algorithm cannot scatter them.
-    if (lang === 'ar') {
-      html = html.replace(/\((?:ref\s*:\s*)?[A-Za-z0-9._-]+\)/g, m => `<span class="pdf-inline-ltr">${m}</span>`);
-      html = html.replace(/\b(?:ISO|NIST|ECC|CSCC|TCC|DCC|OSMACC|CCC)(?:[-_][A-Za-z0-9]+)*\b/g, m => `<span class="pdf-inline-ltr">${m}</span>`);
-    }
-    return html;
-  }
-
   async function downloadPdf(policies, filenameLabel) {
-    // Detect the actual policy language instead of trusting the request value.
-    // This prevents Arabic labels in English PDFs and handles bilingual responses.
-    const allPolicyText = policies.map(p => p.content || '').join('\n');
-    const arabicChars = (allPolicyText.match(/[\u0600-\u06FF]/g) || []).length;
-    const latinChars = (allPolicyText.match(/[A-Za-z]/g) || []).length;
-    const docLang = arabicChars > latinChars * 0.15 ? 'ar' : 'en';
-    const cl = docLang === 'en' ? translations.en : translations.ar;
+    const cl = contentLangDict(lastMeta.language);
     const pl = cl.pdfLabels;
-    const fontSelect = document.getElementById('pdfFont').value;
-    const font = docLang === 'ar' ? fontSelect : "'Inter', sans-serif";
+    const docLang = lastMeta.language === 'en' ? 'en' : 'ar';
+    const font = document.getElementById('pdfFont').value;
     const template = document.getElementById('pdfTemplate');
-    template.style.width = '794px';
-    template.style.boxSizing = 'border-box';
-    template.style.maxWidth = '794px';
+
     template.style.fontFamily = font;
-    template.setAttribute('dir', docLang === 'ar' ? 'rtl' : 'ltr');
     template.style.direction = docLang === 'ar' ? 'rtl' : 'ltr';
+    template.style.textAlign = docLang === 'ar' ? 'right' : 'left';
 
     const classificationVal = document.getElementById('classification').value || 'Public';
     const classificationMap = Object.fromEntries(cl.classificationOptions);
-    document.getElementById('pdfClassificationBadge').textContent = classificationMap[classificationVal] || classificationVal;
+    document.getElementById('pdfClassificationBadge').textContent =
+      classificationMap[classificationVal] || classificationVal;
 
     const logoImg = document.getElementById('pdfLogoImg');
     if (logoDataUrl) {
@@ -915,23 +1045,26 @@
     }
 
     const orgName = lastMeta.companyName || (docLang === 'ar' ? 'المنشأة' : 'Organization');
-    const coverTitle = policies.length === 1 ? policies[0].policyType : (docLang === 'ar' ? 'وثيقة سياسات أمن المعلومات' : 'Information Security Policy Document');
+    const coverTitle = policies.length === 1
+      ? policies[0].policyType
+      : (docLang === 'ar' ? 'وثيقة سياسات أمن المعلومات' : 'Information Security Policy Document');
+
     document.getElementById('pdfCoverTitle').textContent = coverTitle;
     document.getElementById('pdfCoverOrg').textContent = orgName;
 
     const today = new Date().toLocaleDateString(docLang === 'ar' ? 'ar-SA' : 'en-US');
-    const nextYear = new Date(); nextYear.setFullYear(nextYear.getFullYear() + 1);
+    const nextYear = new Date();
+    nextYear.setFullYear(nextYear.getFullYear() + 1);
     const nextYearStr = nextYear.toLocaleDateString(docLang === 'ar' ? 'ar-SA' : 'en-US');
 
     document.getElementById('pdfCoverMeta').innerHTML = `
       <div>${pl.date}<b>${today}</b></div>
       <div>${pl.version}<b>1.0</b></div>
-      <div>${pl.industry}<b>${lastMeta.industry || '-'}</b></div>
+      <div>${pl.industry}<b>${escapeHtml(lastMeta.industry || '-')}</b></div>
     `;
 
-    // Document Control: version table + review table, mimicking the NCA template's structure
     document.getElementById('pdfDocControl').innerHTML = `
-      <div class="pdf-page pdf-structural-page">
+      <div class="pdf-doc-control-page">
         <div class="pdf-table-title">${pl.docControlTitle}</div>
         <table class="pdf-doc-table">
           <tr><th>${pl.versionCol}</th><th>${pl.dateCol}</th><th>${pl.detailsCol}</th></tr>
@@ -942,41 +1075,53 @@
           <tr><th>${pl.reviewRate}</th><th>${pl.lastReview}</th><th>${pl.nextReview}</th></tr>
           <tr><td>${pl.reviewRateVal}</td><td>${today}</td><td>${nextYearStr}</td></tr>
         </table>
-      </div>
-    `;
+      </div>`;
 
-    // Table of contents + body pages, one block per policy, each split into the six sections
-    let tocHtml = `<div class="pdf-page pdf-structural-page"><div class="pdf-table-title">${pl.tocTitle}</div>`;
+    let tocHtml = `<div class="pdf-toc-page"><div class="pdf-table-title">${pl.tocTitle}</div>`;
     let bodyHtml = '';
+
     policies.forEach((p) => {
       const sections = parseSections(p.content);
-      tocHtml += `<div class="pdf-toc-item" style="font-weight:700;margin-top:10px;">${p.policyType}</div>`;
-      bodyHtml += `<div class="pdf-header"><div class="pdf-header-title">${p.policyType}</div><div class="pdf-header-meta">${classificationMap[classificationVal] || classificationVal} • v1.0</div></div>`;
+
+      tocHtml += `<div class="pdf-toc-item" style="font-weight:700;margin-top:12px;">${escapeHtml(p.policyType)}</div>`;
+
+      bodyHtml += `<div class="pdf-policy">
+        <div class="pdf-header">
+          <div class="pdf-header-title">${escapeHtml(p.policyType)}</div>
+          <div class="pdf-header-meta">${escapeHtml(classificationMap[classificationVal] || classificationVal)} • v1.0</div>
+        </div>`;
+
       sections.forEach((s) => {
         const label = s.name ? (cl.sectionLabels[s.name] || s.name) : '';
-        if (label) tocHtml += `<div class="pdf-toc-item">${label}</div>`;
-        bodyHtml += `<section class="pdf-section">`;
-        if (label) bodyHtml += `<div class="pdf-section-title">${label}</div>`;
-        bodyHtml += `<div class="pdf-body">${formatPdfText(s.body, docLang)}</div>`;
-        bodyHtml += `</section>`;
+        if (label) tocHtml += `<div class="pdf-toc-item">${escapeHtml(label)}</div>`;
+
+        bodyHtml += `<div class="pdf-section">
+          ${label ? `<div class="pdf-section-title">${escapeHtml(label)}</div>` : ''}
+          <div class="pdf-body">${escapeHtml(s.body)}</div>
+        </div>`;
       });
+
+      bodyHtml += `</div>`;
     });
+
     tocHtml += `</div>`;
     document.getElementById('pdfToc').innerHTML = tocHtml;
     document.getElementById('pdfBodyPages').innerHTML = bodyHtml;
 
-    // Ensure the logo image (if any) and web fonts are fully loaded before html2canvas
-    // takes its snapshot - capturing too early is a common cause of a blank/partial PDF.
     await waitForImage(logoImg);
     if (document.fonts && document.fonts.ready) {
       try { await document.fonts.ready; } catch (e) {}
     }
-    await new Promise((r) => setTimeout(r, 60));
+    await new Promise((r) => setTimeout(r, 250));
+
+    const safeFilename = (filenameLabel || 'policy')
+      .replace(/[\\/:*?"<>|]+/g, '')
+      .replace(/\s+/g, '_');
 
     return html2pdf()
       .set({
         margin: 0,
-        filename: `${(filenameLabel || 'policy').replace(/\s+/g, '_')}.pdf`,
+        filename: `${safeFilename}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
@@ -984,7 +1129,8 @@
           allowTaint: false,
           backgroundColor: '#ffffff',
           logging: false,
-          letterRendering: true
+          scrollX: 0,
+          scrollY: 0
         },
         jsPDF: {
           unit: 'pt',
@@ -992,14 +1138,12 @@
           orientation: 'portrait',
           compress: true
         },
-        pagebreak: {
-          mode: ['css', 'legacy'],
-          avoid: ['.pdf-section', '.pdf-section-title', '.pdf-header']
-        }
+        pagebreak: { mode: ['css'] }
       })
       .from(template)
       .save();
   }
+
 </script>
 </body>
 </html>
