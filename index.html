@@ -130,9 +130,33 @@
 
   footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center;}
 
-  #pdfClipHost{position:fixed;top:0;left:0;width:0;height:0;overflow:hidden;}
-  #pdfTemplate{width:760px;background:#fff;padding:50px 55px;}
-  #pdfTemplate .pdf-cover{min-height:900px;display:flex;flex-direction:column;}
+  #pdfClipHost{
+  position:absolute;
+  left:-10000px;
+  top:0;
+  width:760px;
+  height:auto;
+  overflow:visible;
+  background:#fff;
+}
+
+#pdfTemplate{
+  width:760px;
+  background:#fff;
+  padding:50px 55px;
+  box-sizing:border-box;
+}
+  #pdfTemplate .pdf-cover{
+  height:1000px;
+  display:flex;
+  flex-direction:column;
+  break-after:page;
+  page-break-after:always;
+}
+  #pdfTemplate .pdf-page{
+  break-inside:avoid;
+  page-break-inside:avoid;
+}
   #pdfTemplate .pdf-cover-top{display:flex;justify-content:space-between;align-items:flex-start;}
   #pdfTemplate .pdf-classification{border:1px solid #1D4ED8;color:#1D4ED8;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;display:inline-block;}
   #pdfTemplate .pdf-logo-box{max-height:70px;max-width:200px;}
@@ -907,9 +931,23 @@
         margin: 0,
         filename: `${(filenameLabel || 'policy').replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }
+        html2canvas: {
+  scale: 2,
+  useCORS: true,
+  allowTaint: false,
+  backgroundColor: '#ffffff',
+  logging: false
+},
+
+jsPDF: {
+  unit: 'pt',
+  format: 'a4',
+  orientation: 'portrait'
+},
+
+pagebreak: {
+  mode: ['css']
+}
       })
       .from(template)
       .save();
