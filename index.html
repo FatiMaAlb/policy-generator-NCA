@@ -156,12 +156,20 @@
     box-sizing:border-box;
     break-after:page;
     page-break-after:always;
+    break-before:auto;
+    page-break-before:auto;
   }
 
-  /* Only structural pages force a new page. Policy sections flow naturally. */
-  #pdfTemplate .pdf-force-page{
-    break-before:page;
-    page-break-before:always;
+  /* Structural pages: each section ends the page, but never starts with a
+     second break. This avoids the blank pages caused by break-before +
+     the previous block's break-after. */
+  #pdfTemplate .pdf-structural-page{
+    break-after:page;
+    page-break-after:always;
+    break-before:auto;
+    page-break-before:auto;
+    break-inside:avoid;
+    page-break-inside:avoid;
   }
 
   #pdfTemplate .pdf-page{
@@ -186,11 +194,12 @@
   #pdfTemplate .pdf-header img{max-height:44px;max-width:150px;}
   #pdfTemplate .pdf-header-title{font-size:15px;font-weight:700;color:#0F172A;}
   #pdfTemplate .pdf-header-meta{font-size:10px;color:#94A3B8;}
-  #pdfTemplate .pdf-section{break-inside:auto;page-break-inside:auto;margin:0;padding:0;}
-  #pdfTemplate .pdf-section-title{font-size:16px;font-weight:700;color:#1D4ED8;margin:20px 0 9px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;break-after:avoid;page-break-after:avoid;break-inside:avoid;page-break-inside:avoid;}
-  #pdfTemplate .pdf-body{font-size:13px;line-height:1.75;white-space:pre-wrap;color:#1E293B;max-width:100%;box-sizing:border-box;overflow-wrap:anywhere;word-break:normal;unicode-bidi:plaintext;}
-  #pdfTemplate[dir="rtl"] .pdf-body, #pdfTemplate[dir="rtl"] .pdf-section-title, #pdfTemplate[dir="rtl"] .pdf-header-title, #pdfTemplate[dir="rtl"] .pdf-header-meta, #pdfTemplate[dir="rtl"] .pdf-toc-item, #pdfTemplate[dir="rtl"] .pdf-table-title{direction:rtl;text-align:right;unicode-bidi:plaintext;}
-  #pdfTemplate[dir="ltr"] .pdf-body, #pdfTemplate[dir="ltr"] .pdf-section-title, #pdfTemplate[dir="ltr"] .pdf-header-title, #pdfTemplate[dir="ltr"] .pdf-header-meta, #pdfTemplate[dir="ltr"] .pdf-toc-item, #pdfTemplate[dir="ltr"] .pdf-table-title{direction:ltr;text-align:left;unicode-bidi:plaintext;}
+  #pdfTemplate .pdf-section{break-inside:auto;page-break-inside:auto;margin:0 0 18px;padding:0;}
+  #pdfTemplate .pdf-section-title{font-size:16px;font-weight:700;color:#1D4ED8;margin:18px 0 9px;border-bottom:1px solid #E2E8F0;padding-bottom:6px;break-after:avoid;page-break-after:avoid;break-inside:avoid;page-break-inside:avoid;}
+  #pdfTemplate .pdf-body{font-size:13px;line-height:1.7;white-space:pre-wrap;color:#1E293B;width:100%;max-width:none;box-sizing:border-box;overflow-wrap:break-word;word-break:normal;unicode-bidi:normal;}
+  #pdfTemplate .pdf-inline-ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;}
+  #pdfTemplate[dir="rtl"] .pdf-body, #pdfTemplate[dir="rtl"] .pdf-section-title, #pdfTemplate[dir="rtl"] .pdf-header-title, #pdfTemplate[dir="rtl"] .pdf-header-meta, #pdfTemplate[dir="rtl"] .pdf-toc-item, #pdfTemplate[dir="rtl"] .pdf-table-title{direction:rtl;text-align:right;unicode-bidi:normal;}
+  #pdfTemplate[dir="ltr"] .pdf-body, #pdfTemplate[dir="ltr"] .pdf-section-title, #pdfTemplate[dir="ltr"] .pdf-header-title, #pdfTemplate[dir="ltr"] .pdf-header-meta, #pdfTemplate[dir="ltr"] .pdf-toc-item, #pdfTemplate[dir="ltr"] .pdf-table-title{direction:ltr;text-align:left;unicode-bidi:normal;}
 </style>
 </head>
 <body>
@@ -862,6 +871,17 @@
     });
   }
 
+  function formatPdfText(text, lang) {
+    let html = escapeHtml(text || '');
+    // Keep control references, URLs, acronyms and Latin fragments together
+    // inside Arabic paragraphs so the bidi algorithm cannot scatter them.
+    if (lang === 'ar') {
+      html = html.replace(/\((?:ref\s*:\s*)?[A-Za-z0-9._-]+\)/g, m => `<span class="pdf-inline-ltr">${m}</span>`);
+      html = html.replace(/\b(?:ISO|NIST|ECC|CSCC|TCC|DCC|OSMACC|CCC)(?:[-_][A-Za-z0-9]+)*\b/g, m => `<span class="pdf-inline-ltr">${m}</span>`);
+    }
+    return html;
+  }
+
   async function downloadPdf(policies, filenameLabel) {
     // Detect the actual policy language instead of trusting the request value.
     // This prevents Arabic labels in English PDFs and handles bilingual responses.
@@ -876,6 +896,7 @@
     const template = document.getElementById('pdfTemplate');
     template.style.width = '794px';
     template.style.boxSizing = 'border-box';
+    template.style.maxWidth = '794px';
     template.style.fontFamily = font;
     template.setAttribute('dir', docLang === 'ar' ? 'rtl' : 'ltr');
     template.style.direction = docLang === 'ar' ? 'rtl' : 'ltr';
@@ -910,7 +931,7 @@
 
     // Document Control: version table + review table, mimicking the NCA template's structure
     document.getElementById('pdfDocControl').innerHTML = `
-      <div class="pdf-page pdf-force-page">
+      <div class="pdf-page pdf-structural-page">
         <div class="pdf-table-title">${pl.docControlTitle}</div>
         <table class="pdf-doc-table">
           <tr><th>${pl.versionCol}</th><th>${pl.dateCol}</th><th>${pl.detailsCol}</th></tr>
@@ -925,7 +946,7 @@
     `;
 
     // Table of contents + body pages, one block per policy, each split into the six sections
-    let tocHtml = `<div class="pdf-page pdf-force-page"><div class="pdf-table-title">${pl.tocTitle}</div>`;
+    let tocHtml = `<div class="pdf-page pdf-structural-page"><div class="pdf-table-title">${pl.tocTitle}</div>`;
     let bodyHtml = '';
     policies.forEach((p) => {
       const sections = parseSections(p.content);
@@ -936,7 +957,7 @@
         if (label) tocHtml += `<div class="pdf-toc-item">${label}</div>`;
         bodyHtml += `<section class="pdf-section">`;
         if (label) bodyHtml += `<div class="pdf-section-title">${label}</div>`;
-        bodyHtml += `<div class="pdf-body">${escapeHtml(s.body)}</div>`;
+        bodyHtml += `<div class="pdf-body">${formatPdfText(s.body, docLang)}</div>`;
         bodyHtml += `</section>`;
       });
     });
@@ -972,9 +993,8 @@
           compress: true
         },
         pagebreak: {
-          mode: ['css'],
-          before: '.pdf-force-page',
-          avoid: ['.pdf-section-title']
+          mode: ['css', 'legacy'],
+          avoid: ['.pdf-section', '.pdf-section-title', '.pdf-header']
         }
       })
       .from(template)
